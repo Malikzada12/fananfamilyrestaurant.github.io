@@ -4,7 +4,7 @@
     <!-- ============== SEO Meta Tags ============== -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fanan Family Restaurant | AI Drink Suggestions, Deals & Best Desi Food</title>
+    <title>Fanan Family Restaurant |Deals & Best Desi Food</title>
     <meta name="description" content="Get AI-powered drink suggestions with your meal! Order authentic Pakistani cuisine, deals, and platters online from Fanan Family Restaurant in Multan.">
     <meta name="keywords" content="AI food suggestion, Pakistani restaurant Multan, student deal multan, desi food deals, food platters multan, Fanan Family Restaurant, best biryani Multan, family restaurant Multan, chicken karahi, online food order">
     <meta name="author" content="Fanan Family Restaurant">
@@ -123,11 +123,11 @@
             transform: translateY(0);
             opacity: 1;
         }
-        /* Cart Styles */
-        #cart-panel, #mobile-menu {
-            transition: transform 0.3s ease-in-out;
+        /* Modal & Cart Styles */
+        .modal, #cart-panel, #mobile-menu {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
         }
-        #cart-overlay {
+        .modal-overlay, #cart-overlay {
             transition: opacity 0.3s ease-in-out;
         }
         .cart-item-quantity-btn {
@@ -150,7 +150,7 @@
             left: 50%;
             transform: translateX(-50%);
             transition: bottom 0.5s ease-in-out;
-            z-index: 101;
+            z-index: 200;
         }
         #toast-notification.show {
             bottom: 30px;
@@ -238,7 +238,7 @@
         <!-- Menu Section with Tabs -->
         <section id="menu" class="py-20 md:py-24">
             <div class="container mx-auto px-6 reveal">
-                <h2 class="text-4xl lg:text-5xl font-display text-center mb-4">Hamara Menu</h2>
+                <h2 class="text-4xl lg:text-5xl font-display text-center mb-4">Our Menu</h2>
                 <p class="text-center text-lg text-gray-600 max-w-2xl mx-auto mb-12">Sizzling BBQ se le kar mazedar Karahi tak, har cheez lajawab.</p>
 
                 <div id="tab-buttons" class="flex flex-wrap justify-center border-b mb-12 space-x-2 md:space-x-8">
@@ -255,53 +255,30 @@
                 </div>
             </div>
         </section>
-        
-        <!-- Other sections -->
-        <section id="specials" class="py-24" style="background-color: var(--dark-bg); color: var(--text-light);">
-            <div class="container mx-auto px-6 reveal">
-                <h2 class="text-4xl md:text-5xl font-display text-center mb-16" style="color: var(--primary-color);">Chef's Signature Dishes</h2>
-                <div class="space-y-20">
-                    <div class="grid md:grid-cols-2 gap-12 items-center">
-                        <div>
-                             <img src="https://images.unsplash.com/photo-1604558451121-274514304886?q=80&w=1887&auto=format&fit=crop" class="rounded-lg shadow-2xl w-full h-auto object-cover" alt="Fanan Special Mutton Ribs">
-                        </div>
-                         <div class="text-center md:text-left">
-                            <h3 class="text-3xl md:text-4xl">Special Mutton Ribs</h3>
-                            <p class="text-lg text-gray-400 my-4">Slow-cooked for 8 hours, our mutton ribs are marinated in a secret family blend of spices, making them unbelievably tender and flavorful. A true Fanan legacy!</p>
-                            <span class="font-bold text-2xl" style="color: var(--primary-color);">Rs. 2500</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
     </main>
-
+    
     <!-- Floating Cart Button -->
     <button id="floating-cart-button" class="bg-yellow-500 text-white p-4 rounded-full shadow-lg relative transform hover:scale-110 transition-transform">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
         <span id="cart-count" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center hidden">0</span>
     </button>
-    
     <!-- Add to Cart Toast Notification -->
     <div id="toast-notification" class="bg-gray-800 text-white py-2 px-6 rounded-full shadow-lg">
         <p id="toast-message"></p>
     </div>
 
     <!-- Cart Panel -->
-    <div id="cart-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden"></div>
-    <div id="cart-panel" class="fixed top-0 right-0 w-full max-w-md h-full bg-white z-50 shadow-2xl transform translate-x-full flex flex-col">
+    <div id="cart-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-[110] hidden"></div>
+    <div id="cart-panel" class="fixed top-0 right-0 w-full max-w-md h-full bg-white z-[120] shadow-2xl transform translate-x-full flex flex-col">
         <div class="flex justify-between items-center p-4 border-b">
-            <h2 class="text-2xl font-display">Aapka Cart</h2>
+            <h2 class="text-2xl font-display">Cart Menu</h2>
             <button id="cart-close-button" class="p-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
         </div>
         <div id="cart-items" class="flex-grow p-4 overflow-y-auto">
-            <!-- Cart items will be generated here -->
-            <p id="empty-cart-msg" class="text-center text-gray-500">Aapka cart khaali hai.</p>
+            <p id="empty-cart-msg" class="text-center text-gray-500">Your Cart is Empty.</p>
         </div>
-        <!-- AI Suggestion Area -->
         <div id="ai-suggestion-area" class="p-4 border-t hidden">
              <button id="suggestion-button" class="w-full btn btn-ai mb-4">Perfect Drink Suggestion ✨</button>
              <div id="suggestion-result" class="text-center"></div>
@@ -314,12 +291,37 @@
             <button id="checkout-button" class="w-full btn btn-primary">Place Order</button>
         </div>
     </div>
+    
+    <!-- Checkout Modal -->
+    <div id="checkout-modal-overlay" class="fixed inset-0 bg-black bg-opacity-60 z-[130] hidden modal-overlay"></div>
+    <div id="checkout-modal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11/12 max-w-lg bg-white p-6 rounded-lg shadow-2xl z-[140] hidden modal scale-95 opacity-0">
+        <h2 class="text-3xl font-display mb-6 text-center">Order Details</h2>
+        <form id="checkout-form">
+            <div class="mb-4">
+                <label for="customer-name" class="block text-gray-700 font-semibold mb-2">Your Name</label>
+                <input type="text" id="customer-name" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500" required>
+            </div>
+            <div class="mb-4">
+                <label for="customer-phone" class="block text-gray-700 font-semibold mb-2">Phone Number</label>
+                <input type="tel" id="customer-phone" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500" required>
+            </div>
+            <div class="mb-6">
+                <label for="customer-address" class="block text-gray-700 font-semibold mb-2">Delivery Address</label>
+                <textarea id="customer-address" rows="3" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500" required></textarea>
+            </div>
+            <div class="flex justify-end space-x-4">
+                <button type="button" id="cancel-order-button" class="btn bg-gray-300 text-gray-800">Cancel</button>
+                <button type="submit" class="btn btn-primary">Confirm & Send on WhatsApp</button>
+            </div>
+        </form>
+    </div>
+
 
     <!-- Footer etc. -->
     <footer id="contact" class="bg-gray-900 text-white py-20">
         <div class="container mx-auto px-6 text-center reveal">
             <h2 class="text-4xl font-display mb-4">Visit or Call Us</h2>
-            <p class="text-lg text-gray-400 mb-8">We are open from 12:00 PM to 2:00 AM, seven days a week.</p>
+            <p class="text-lg text-gray-400 mb-8">We are open from 12:00 PM to 2:00 AM, Seven days a week.</p>
             <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
                 <div class="bg-gray-800 p-8 rounded-lg">
                     <h3 class="text-2xl font-display text-yellow-400 mb-2">Location</h3>
@@ -343,6 +345,7 @@
         let cart = [];
         const menuItemsContainer = document.getElementById('menu-items-container');
         const tabButtons = document.querySelectorAll('.tab-button');
+        const restaurantWhatsAppNumber = "923008738377"; // IMPORTANT: Replace with your actual WhatsApp number with country code
         
         // --- Menu Data ---
         const menuData = {
@@ -354,14 +357,10 @@
             salan: [
                 { id: 'S01', name: 'Chicken Karahi', desc: 'Classic wok-cooked dish with rich tomato and ginger gravy.', price: 1200, img: 'https://images.unsplash.com/photo-1631515243349-e0cb75fb8da7?q=80&w=600&auto=format&fit=crop', type: 'food' },
                 { id: 'S02', name: 'Mutton Korma', desc: 'Tender mutton in a creamy, spiced yogurt sauce.', price: 1800, img: 'https://images.unsplash.com/photo-1629548489387-2795b861aa84?q=80&w=600&auto=format&fit=crop', type: 'food' },
-                { id: 'S03', name: 'Palak Paneer', desc: 'Soft cheese cubes in a flavourful spinach gravy.', price: 900, img: 'https://images.unsplash.com/photo-1585937421612-70a0583562be?q=80&w=600&auto=format&fit=crop', type: 'food' },
-                { id: 'S04', name: 'Daal Maash Fry', desc: 'Creamy white lentils fried with onions, garlic, and spices.', price: 750, img: 'https://placehold.co/600x400/8B4513/FFF?text=Daal+Maash', type: 'food' }
             ],
             bbq: [
                 { id: 'B01', name: 'Chicken Tikka Boti', desc: 'Spicy, marinated chicken chunks grilled to perfection.', price: 800, img: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?q=80&w=600&auto=format&fit=crop', type: 'food' },
                 { id: 'B02', name: 'Seekh Kebab', desc: 'Minced meat skewers infused with herbs and spices.', price: 950, img: 'https://images.unsplash.com/photo-1529692236671-f1f6b5f46b54?q=80&w=600&auto=format&fit=crop', type: 'food' },
-                { id: 'B03', name: 'Malai Boti', desc: 'Creamy, non-spicy chicken pieces, tender and juicy.', price: 1000, img: 'https://placehold.co/600x400/DEB887/333?text=Malai+Boti', type: 'food' },
-                { id: 'B04', name: 'Fish Tikka', desc: 'Delicate fish marinated in tandoori spices and grilled.', price: 1500, img: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?q=80&w=600&auto=format&fit=crop', type: 'food' }
             ],
             rice: [
                 { id: 'R01', name: 'Chicken Biryani', desc: 'Aromatic basmati rice with spiced chicken, a national favorite.', price: 600, img: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?q=80&w=600&auto=format&fit=crop', type: 'food' },
@@ -371,12 +370,10 @@
                 { id: 'V01', name: 'Sweet Lassi', desc: 'Refreshing and creamy sweet yogurt-based drink.', price: 200, img: 'https://placehold.co/600x400/E6E6FA/333?text=Lassi', type: 'drink' },
                 { id: 'V02', name: 'Mint Margarita', desc: 'A zesty and cool slushy perfect for Multan\'s heat.', price: 250, img: 'https://placehold.co/600x400/98FB98/333?text=Margarita', type: 'drink' },
                 { id: 'V03', name: 'Soft Drink', desc: 'Chilled carbonated soft drinks.', price: 100, img: 'https://placehold.co/600x400/FF6347/FFF?text=Soft+Drink', type: 'drink' },
-                { id: 'V04', name: 'Mineral Water', desc: 'Pure and refreshing mineral water.', price: 80, img: 'https://placehold.co/600x400/87CEEB/FFF?text=Water', type: 'drink' }
             ],
             bread: [
                 { id: 'N01', name: 'Roghni Naan', desc: 'Soft, fluffy naan bread brushed with butter and sesame seeds.', price: 70, img: 'https://placehold.co/600x400/D2691E/FFF?text=Roghni+Naan', type: 'food' },
                 { id: 'N02', name: 'Garlic Naan', desc: 'Popular flatbread topped with fresh garlic and coriander.', price: 80, img: 'https://placehold.co/600x400/DEB887/333?text=Garlic+Naan', type: 'food' },
-                { id: 'N03', name: 'Tandoori Roti', desc: 'Whole wheat bread cooked in a traditional clay tandoor.', price: 30, img: 'https://placehold.co/600x400/8B4513/FFF?text=Tandoori+Roti', type: 'food' }
             ]
         };
 
@@ -391,6 +388,9 @@
         const aiSuggestionArea = document.getElementById('ai-suggestion-area');
         const suggestionButton = document.getElementById('suggestion-button');
         const suggestionResultEl = document.getElementById('suggestion-result');
+        const checkoutModal = document.getElementById('checkout-modal');
+        const checkoutModalOverlay = document.getElementById('checkout-modal-overlay');
+        const checkoutForm = document.getElementById('checkout-form');
         
         // --- Toast Notification Logic ---
         function showToast(message) {
@@ -423,7 +423,7 @@
                     itemName = itemToAdd.name;
                 }
             }
-            if(showMsg) showToast(`'${itemName}' cart mein add ho gaya hai!`);
+            if(showMsg) showToast(`'${itemName}' Added to your Cart Menu!`);
             updateCart();
         }
 
@@ -474,11 +474,12 @@
             });
         }
         
-        window.updateQuantity = updateQuantity; // Make it globally accessible
+        window.updateQuantity = updateQuantity;
 
         function updateCartTotal() {
             const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             cartTotalEl.textContent = `Rs. ${total}`;
+            return total;
         }
 
         function updateCartCount() {
@@ -495,8 +496,67 @@
         function toggleCart() {
             cartPanel.classList.toggle('translate-x-full');
             cartOverlay.classList.toggle('hidden');
-            // document.body.classList.toggle('overflow-hidden');
         }
+        
+        // --- Checkout Modal Logic ---
+        function toggleCheckoutModal() {
+            if (checkoutModal.classList.contains('hidden')) {
+                checkoutModal.classList.remove('hidden');
+                checkoutModalOverlay.classList.remove('hidden');
+                setTimeout(() => {
+                    checkoutModal.classList.remove('scale-95', 'opacity-0');
+                }, 10);
+            } else {
+                checkoutModal.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    checkoutModal.classList.add('hidden');
+                    checkoutModalOverlay.classList.add('hidden');
+                }, 300);
+            }
+        }
+        
+        document.getElementById('checkout-button').addEventListener('click', () => {
+             if(cart.length === 0) {
+                alert('Add Some item in Cart .');
+                return;
+            }
+            toggleCart(); // Close the cart panel
+            toggleCheckoutModal(); // Open the checkout modal
+        });
+        
+        document.getElementById('cancel-order-button').addEventListener('click', toggleCheckoutModal);
+        checkoutModalOverlay.addEventListener('click', toggleCheckoutModal);
+        
+        checkoutForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const customerName = document.getElementById('customer-name').value;
+            const customerPhone = document.getElementById('customer-phone').value;
+            const customerAddress = document.getElementById('customer-address').value;
+            
+            let orderSummary = `*New Order from Fanan Restaurant Website* 🍲\n\n`;
+            orderSummary += `*Customer Details:*\n`;
+            orderSummary += `Name: ${customerName}\n`;
+            orderSummary += `Phone: ${customerPhone}\n`;
+            orderSummary += `Address: ${customerAddress}\n\n`;
+            orderSummary += `*Order Items:*\n`;
+            
+            cart.forEach(item => {
+                orderSummary += `- ${item.name} (x${item.quantity}) = Rs. ${item.price * item.quantity}\n`;
+            });
+            
+            orderSummary += `\n*Total Amount: Rs. ${updateCartTotal()}*`;
+            
+            const whatsappUrl = `https://wa.me/${restaurantWhatsAppNumber}?text=${encodeURIComponent(orderSummary)}`;
+            
+            window.open(whatsappUrl, '_blank');
+            
+            // Clear everything
+            cart = [];
+            updateCart();
+            checkoutForm.reset();
+            toggleCheckoutModal();
+        });
+
 
         // --- AI Suggestion Logic ---
         function toggleAiSuggestion() {
@@ -505,17 +565,15 @@
                 aiSuggestionArea.classList.remove('hidden');
             } else {
                 aiSuggestionArea.classList.add('hidden');
-                suggestionResultEl.innerHTML = ''; // Clear previous suggestion
+                suggestionResultEl.innerHTML = ''; 
             }
         }
 
         async function getDrinkSuggestion() {
             suggestionButton.disabled = true;
-            suggestionResultEl.innerHTML = `<p class="text-gray-500">Aapke liye behtareen drink dhoond rahay hain...</p>`;
-
+            suggestionResultEl.innerHTML = `<p class="text-gray-500">Suggesting the best drink for you...</p>`;
             const foodItems = cart.filter(item => item.type === 'food').map(item => item.name).join(', ');
             const drinkOptions = menuData.beverages.map(drink => drink.name).join(', ');
-            
             const prompt = `You are a helpful restaurant assistant for 'Fanan Family Restaurant', which serves spicy and rich Pakistani food. A customer has the following items in their cart: ${foodItems}. Based on these items, suggest the single best beverage to pair with their meal from the following available options: ${drinkOptions}. Provide your response as a valid JSON object with two keys: "drinkName" (the exact name of the suggested drink from the list) and "reason" (a short, fun, one-sentence reason in Hindi (Latin) explaining why it's a good pairing). Example: {"drinkName": "Sweet Lassi", "reason": "Is masaledar khane ke baad thandi lassi ka maza hi kuch aur hai!"}`;
             
             try {
@@ -532,21 +590,17 @@
                  const result = await response.json();
                 
                  if (result.candidates && result.candidates.length > 0) {
-                    const textResponse = result.candidates[0].content.parts[0].text;
+                    const textResponse = result.candidates[0].content.parts[0].text.replace(/```json\n?/, '').replace(/```$/, '');
                     const jsonResponse = JSON.parse(textResponse);
                     const suggestedDrink = menuData.beverages.find(d => d.name === jsonResponse.drinkName);
                     if(suggestedDrink) {
                         renderSuggestion(suggestedDrink, jsonResponse.reason);
-                    } else {
-                         throw new Error("Suggested drink not found in menu.");
-                    }
-                 } else {
-                    throw new Error("No suggestion received from AI.");
-                 }
+                    } else { throw new Error("Suggested drink not found in menu."); }
+                 } else { throw new Error("No suggestion received from AI."); }
 
             } catch(error) {
                 console.error("Gemini API Error:", error);
-                suggestionResultEl.innerHTML = `<p class="text-red-500">Maaf kijiyega, abhi suggestion nahi de sakte.</p>`;
+                suggestionResultEl.innerHTML = `<p class="text-red-500">Sorry, process is not responding at this moment.</p>`;
             } finally {
                 suggestionButton.disabled = false;
             }
@@ -555,7 +609,7 @@
         function renderSuggestion(drink, reason) {
              suggestionResultEl.innerHTML = `
                 <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                    <p class="font-semibold text-gray-700">Hamari Salah:</p>
+                    <p class="font-semibold text-gray-700">Our Opinion:</p>
                     <div class="flex items-center my-2">
                         <img src="${drink.img}" alt="${drink.name}" class="w-12 h-12 rounded-full object-cover mr-3">
                         <div>
@@ -567,31 +621,11 @@
                 </div>
             `;
         }
-
-        window.addSuggestedToCart = (itemId) => {
-            addToCart(itemId);
-            suggestionResultEl.innerHTML = `<p class="text-green-600 font-semibold">Behtareen! Cart mein add ho gaya.</p>`;
-        };
-
+        window.addSuggestedToCart = (itemId) => { addToCart(itemId); suggestionResultEl.innerHTML = `<p class="text-green-600 font-semibold">Behtareen! Cart mein add ho gaya.</p>`; };
         suggestionButton.addEventListener('click', getDrinkSuggestion);
-
-
-        // --- Event Listeners for Cart ---
-        [document.getElementById('floating-cart-button'), document.getElementById('cart-close-button'), cartOverlay].forEach(el => {
-            el.addEventListener('click', toggleCart);
-        });
-
-        document.getElementById('checkout-button').addEventListener('click', () => {
-            if(cart.length > 0) {
-                alert('Aapka order wasool ho gaya hai! Jald hi aapse raabta kiya jayega.');
-                cart = [];
-                updateCart();
-                toggleCart();
-            } else {
-                alert('Order karne ke liye pehle cart mein kuch daalein.');
-            }
-        });
-
+        document.getElementById('floating-cart-button').addEventListener('click', toggleCart);
+        document.getElementById('cart-close-button').addEventListener('click', toggleCart);
+        cartOverlay.addEventListener('click', toggleCart);
 
         // --- Menu Rendering Logic ---
         function renderMenuItems(category) {
@@ -613,11 +647,9 @@
                 `;
                 menuItemsContainer.appendChild(card);
             });
-             // Add event listeners to the new buttons
             menuItemsContainer.querySelectorAll('[data-item-id]').forEach(button => {
                 button.addEventListener('click', (e) => {
-                    const itemId = e.target.dataset.itemId;
-                    addToCart(itemId);
+                    addToCart(e.target.dataset.itemId);
                 });
             });
         }
@@ -629,9 +661,7 @@
                 renderMenuItems(button.dataset.tab);
             });
         });
-
         renderMenuItems('deals'); // Initial render
-        
         
         // --- Mobile Menu Toggle ---
         const menuButton = document.getElementById('mobile-menu-button');
@@ -639,26 +669,13 @@
         const openIcon = document.getElementById('menu-open-icon');
         const closeIcon = document.getElementById('menu-close-icon');
         const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
-        
-        function toggleMobileMenu() {
-            mobileMenu.classList.toggle('-translate-x-full');
-            openIcon.classList.toggle('hidden');
-            closeIcon.classList.toggle('hidden');
-        }
-        
+        function toggleMobileMenu() { mobileMenu.classList.toggle('-translate-x-full'); openIcon.classList.toggle('hidden'); closeIcon.classList.toggle('hidden'); }
         menuButton.addEventListener('click', toggleMobileMenu);
         mobileNavLinks.forEach(link => link.addEventListener('click', toggleMobileMenu));
         
-
         // --- Animation and Other JS ---
         const revealElements = document.querySelectorAll(".reveal");
-        function reveal() {
-            for (let i = 0; i < revealElements.length; i++) {
-                if (revealElements[i].getBoundingClientRect().top < window.innerHeight - 100) {
-                    revealElements[i].classList.add("active");
-                }
-            }
-        }
+        function reveal() { for (let i = 0; i < revealElements.length; i++) { if (revealElements[i].getBoundingClientRect().top < window.innerHeight - 100) { revealElements[i].classList.add("active"); } } }
         window.addEventListener("scroll", reveal);
         reveal();
         document.getElementById('year').textContent = new Date().getFullYear();
