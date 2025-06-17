@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en-Pk">
+<html lang="en-PK">
 <head>
     <!-- ============== SEO Meta Tags ============== -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fanan Family Restaurant | Best Pakistani & Desi Food in Multan</title>
-    <meta name="description" content="Experience authentic Pakistani cuisine at Fanan Family Restaurant in Multan. We serve the best Biryani, Karahi, BBQ, and traditional desi food. Perfect for family dining.">
-    <meta name="keywords" content="Pakistani restaurant Multan, desi food Multan, Fanan Family Restaurant, best biryani Multan, family restaurant Multan, chicken karahi, mutton korma, BBQ platter, Pakistani cuisine, Old Shujabad Road restaurant">
+    <title>Fanan Family Restaurant | AI Drink Suggestions, Deals & Best Desi Food</title>
+    <meta name="description" content="Get AI-powered drink suggestions with your meal! Order authentic Pakistani cuisine, deals, and platters online from Fanan Family Restaurant in Multan.">
+    <meta name="keywords" content="AI food suggestion, Pakistani restaurant Multan, student deal multan, desi food deals, food platters multan, Fanan Family Restaurant, best biryani Multan, family restaurant Multan, chicken karahi, online food order">
     <meta name="author" content="Fanan Family Restaurant">
 
     <!-- ============== Favicon ============== -->
@@ -32,6 +32,7 @@
             font-family: 'Poppins', sans-serif;
             background-color: var(--light-bg);
             color: var(--text-dark);
+            overflow-x: hidden; /* Prevent horizontal scroll */
         }
         .font-display { font-family: 'Cormorant Garamond', serif; }
         h1, h2, h3 {
@@ -39,10 +40,10 @@
             font-weight: 700;
         }
         .hero-section {
-            background-image: linear-gradient(rgba(26, 26, 26, 0.7), rgba(26, 26, 26, 0.7)), url(Menu\ List\ 2.jpg );
+            background-image: linear-gradient(rgba(26, 26, 26, 0.7), rgba(26, 26, 26, 0.7)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2070&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
-            background-attachment: fixed; /* Parallax effect */
+            background-attachment: fixed; /* Parallax effect on desktop */
         }
         .nav-link {
             position: relative;
@@ -60,20 +61,38 @@
             transition: width 0.4s ease;
         }
         .nav-link:hover::after, .nav-link.active::after { width: 100%; }
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 12px 32px;
+        .btn {
+            padding: 10px 24px;
             border-radius: 50px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: all 0.3s ease;
+            display: inline-block;
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
             box-shadow: 0 4px 15px rgba(192, 132, 1, 0.3);
         }
         .btn-primary:hover {
             transform: translateY(-3px);
             box-shadow: 0 7px 20px rgba(192, 132, 1, 0.5);
+        }
+        .btn-secondary {
+            background-color: #4a5568;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #2d3748;
+        }
+        .btn-ai {
+            background: linear-gradient(45deg, #8A2BE2, #4A00E0);
+            color: white;
+        }
+        .btn-ai:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(74, 0, 224, 0.4);
         }
         .tab-button {
             transition: all 0.3s ease;
@@ -104,16 +123,47 @@
             transform: translateY(0);
             opacity: 1;
         }
+        /* Cart Styles */
+        #cart-panel, #mobile-menu {
+            transition: transform 0.3s ease-in-out;
+        }
+        #cart-overlay {
+            transition: opacity 0.3s ease-in-out;
+        }
+        .cart-item-quantity-btn {
+            width: 28px;
+            height: 28px;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+        }
+        /* Floating Cart Button */
+        #floating-cart-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+        /* Add to Cart Popup/Toast */
+        #toast-notification {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: bottom 0.5s ease-in-out;
+            z-index: 101;
+        }
+        #toast-notification.show {
+            bottom: 30px;
+        }
     </style>
 
-    <!-- ============== SEO: JSON-LD Schema Markup for Restaurant ============== -->
+    <!-- SEO: JSON-LD Schema -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "Restaurant",
       "name": "Fanan Family Restaurant",
       "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2070&auto=format&fit=crop",
-      "@id": "",
       "url": "https://www.FananFamilyRestaurant.com",
       "telephone": "+923008738377",
       "priceRange": "PKR",
@@ -126,22 +176,10 @@
         "addressRegion": "Punjab",
         "country": "PK"
       },
-      "geo": {
-        "@type": "GeoCoordinates",
-        "latitude": 30.1575,
-        "longitude": 71.5249 
-      },
+      "geo": { "@type": "GeoCoordinates", "latitude": 30.1575, "longitude": 71.5249 },
       "openingHoursSpecification": {
         "@type": "OpeningHoursSpecification",
-        "dayOfWeek": [
-          "Monday",
-          "Tuesday",
-          "Wednesday",
-          "Thursday",
-          "Friday",
-          "Saturday",
-          "Sunday"
-        ],
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
         "opens": "12:00",
         "closes": "02:00"
       } 
@@ -150,18 +188,41 @@
 </head>
 <body class="text-gray-800">
 
-    <!-- Hero Section with Centered Navigation -->
-    <section class="hero-section h-screen flex flex-col text-white">
+    <!-- Header for Mobile and Top bar for Desktop -->
+    <header class="bg-gray-900 text-white sticky top-0 z-50 shadow-md lg:hidden">
+        <div class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+             <a href="#" class="text-2xl font-display font-bold">Fanan Restaurant</a>
+             <button id="mobile-menu-button" class="p-2 focus:outline-none">
+                 <svg id="menu-open-icon" xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                 <svg id="menu-close-icon" xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+             </button>
+        </div>
+    </header>
+    
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="lg:hidden fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-95 z-40 transform -translate-x-full flex items-center justify-center text-center">
+        <nav class="flex flex-col space-y-8 text-2xl text-white">
+            <a href="#about" class="nav-link mobile-nav-link">About</a>
+            <a href="#menu" class="nav-link mobile-nav-link">Menu</a>
+            <a href="#specials" class="nav-link mobile-nav-link">Specials</a>
+            <a href="#gallery" class="nav-link mobile-nav-link">Gallery</a>
+            <a href="#reviews" class="nav-link mobile-nav-link">Reviews</a>
+            <a href="#contact" class="nav-link mobile-nav-link">Contact</a>
+        </nav>
+    </div>
+
+    <!-- Hero Section with Centered Navigation for Desktop -->
+    <section class="hero-section min-h-screen flex flex-col text-white">
         <div class="flex-grow flex flex-col justify-center items-center text-center px-4">
              <div class="mb-8 reveal active">
                 <span class="text-xl text-yellow-300">Welcome To</span>
-                <h1 class="text-6xl md:text-8xl font-display mt-2">Fanan Restaurant</h1>
-                <p class="text-lg md:text-xl mt-4 text-gray-300">A Taste of Authentic Pakistani Tradition in Multan</p>
+                <h1 class="text-5xl sm:text-6xl md:text-8xl font-display mt-2">Fanan Restaurant</h1>
+                <p class="text-lg md:text-xl mt-4 text-gray-300 max-w-3xl">A Taste of Authentic Pakistani Tradition in Multan</p>
             </div>
-            <a href="#menu" class="btn-primary reveal active">Explore Menu</a>
+            <a href="#menu" class="btn btn-primary reveal active">Explore Menu</a>
         </div>
-        <nav id="navbar" class="bg-black bg-opacity-50 backdrop-blur-sm py-4 sticky top-0 z-50">
-            <div class="container mx-auto flex justify-center items-center space-x-4 md:space-x-10 text-base md:text-lg">
+        <nav id="navbar" class="hidden lg:flex bg-black bg-opacity-50 backdrop-blur-sm py-4 justify-center items-center sticky top-0">
+            <div class="container mx-auto flex justify-center items-center space-x-10 text-lg">
                 <a href="#about" class="nav-link">About</a>
                 <a href="#menu" class="nav-link">Menu</a>
                 <a href="#specials" class="nav-link">Specials</a>
@@ -174,64 +235,28 @@
 
     <!-- Main Content -->
     <main>
-        <!-- About Us Section -->
-        <section id="about" class="py-24 bg-white">
-            <div class="container mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
-                <div class="reveal">
-                    <img src="Fanan Menu List.jpg" alt="Chef preparing authentic Pakistani food" class="rounded-lg shadow-2xl">
-                </div>
-                <div class="reveal">
-                    <h2 class="text-4xl md:text-5xl font-display mb-6">Our Story of Taste & Tradition</h2>
-                    <p class="text-lg text-gray-600 mb-4">
-                        Nestled in the heart of Multan, Fanan Family Restaurant was born from a passion for authentic Pakistani cuisine. We believe in family, tradition, and the joy of sharing a good meal made with love.
-                    </p>
-                    <p class="text-lg text-gray-600">
-                        Our chefs use age-old recipes passed down through generations and the freshest local ingredients to bring you a dining experience that's both timeless and unforgettable. Come and taste the true essence of desi food.
-                    </p>
-                </div>
-            </div>
-        </section>
-
         <!-- Menu Section with Tabs -->
-        <section id="menu" class="py-24">
+        <section id="menu" class="py-20 md:py-24">
             <div class="container mx-auto px-6 reveal">
-                <h2 class="text-4xl md:text-5xl font-display text-center mb-4">Our Exquisite Menu</h2>
-                <p class="text-center text-lg text-gray-600 max-w-2xl mx-auto mb-12">Explore our wide range of dishes, from sizzling BBQ platters to hearty Karahis and aromatic Biryanis.</p>
+                <h2 class="text-4xl lg:text-5xl font-display text-center mb-4">Hamara Menu</h2>
+                <p class="text-center text-lg text-gray-600 max-w-2xl mx-auto mb-12">Sizzling BBQ se le kar mazedar Karahi tak, har cheez lajawab.</p>
 
                 <div id="tab-buttons" class="flex flex-wrap justify-center border-b mb-12 space-x-2 md:space-x-8">
-                    <button class="tab-button active text-base md:text-lg font-semibold py-2 px-4" data-tab="salan">Main Courses</button>
+                    <button class="tab-button active text-base md:text-lg font-semibold py-2 px-4" data-tab="deals">Deals & Platters</button>
+                    <button class="tab-button text-base md:text-lg font-semibold py-2 px-4" data-tab="salan">Main Courses</button>
                     <button class="tab-button text-base md:text-lg font-semibold py-2 px-4" data-tab="bbq">BBQ & Grill</button>
                     <button class="tab-button text-base md:text-lg font-semibold py-2 px-4" data-tab="rice">Rice Dishes</button>
+                    <button class="tab-button text-base md:text-lg font-semibold py-2 px-4" data-tab="beverages">Beverages</button>
                     <button class="tab-button text-base md:text-lg font-semibold py-2 px-4" data-tab="bread">Breads</button>
                 </div>
 
-                <div id="tab-content" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Main Courses -->
-                    <div class="tab-pane active" data-tab-pane="salan"><div class="menu-item-card h-full flex flex-col"><img src="https://images.unsplash.com/photo-1631515243349-e0cb75fb8da7?q=80&w=600&auto=format&fit=crop" alt="Chicken Karahi in Multan" class="w-full h-48 object-cover"><div class="p-6 flex-grow flex flex-col"><h3 class="text-2xl mb-2">Chicken Karahi</h3><p class="text-gray-600 mb-4 flex-grow">A classic wok-cooked dish with rich tomato and ginger gravy.</p><span class="font-bold text-xl text-yellow-700 mt-4">Rs. 1200</span></div></div></div>
-                    <div class="tab-pane active" data-tab-pane="salan"><div class="menu-item-card h-full flex flex-col"><img src="https://images.unsplash.com/photo-1629548489387-2795b861aa84?q=80&w=600&auto=format&fit=crop" alt="Mutton Korma at Fanan Restaurant" class="w-full h-48 object-cover"><div class="p-6 flex-grow flex flex-col"><h3 class="text-2xl mb-2">Mutton Korma</h3><p class="text-gray-600 mb-4 flex-grow">Tender mutton in a creamy, spiced yogurt sauce.</p><span class="font-bold text-xl text-yellow-700 mt-4">Rs. 1800</span></div></div></div>
-                    <div class="tab-pane active" data-tab-pane="salan"><div class="menu-item-card h-full flex flex-col"><img src="https://images.unsplash.com/photo-1585937421612-70a0583562be?q=80&w=600&auto=format&fit=crop" alt="Vegetarian Palak Paneer" class="w-full h-48 object-cover"><div class="p-6 flex-grow flex flex-col"><h3 class="text-2xl mb-2">Palak Paneer</h3><p class="text-gray-600 mb-4 flex-grow">Soft cheese cubes in a flavourful spinach gravy.</p><span class="font-bold text-xl text-yellow-700 mt-4">Rs. 900</span></div></div></div>
-                    <div class="tab-pane active" data-tab-pane="salan"><div class="menu-item-card h-full flex flex-col"><img src="https://placehold.co/600x400/8B4513/FFF?text=Daal+Maash" alt="Daal Maash Fry" class="w-full h-48 object-cover"><div class="p-6 flex-grow flex flex-col"><h3 class="text-2xl mb-2">Daal Maash Fry</h3><p class="text-gray-600 mb-4 flex-grow">Creamy white lentils fried with onions, garlic, and spices.</p><span class="font-bold text-xl text-yellow-700 mt-4">Rs. 750</span></div></div></div>
-                    
-                    <!-- BBQ -->
-                    <div class="tab-pane hidden" data-tab-pane="bbq"><div class="menu-item-card h-full flex flex-col"><img src="https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?q=80&w=600&auto=format&fit=crop" alt="Chicken Tikka Boti BBQ" class="w-full h-48 object-cover"><div class="p-6 flex-grow flex flex-col"><h3 class="text-2xl mb-2">Chicken Tikka Boti</h3><p class="text-gray-600 mb-4 flex-grow">Spicy, marinated chicken chunks grilled to perfection.</p><span class="font-bold text-xl text-yellow-700 mt-4">Rs. 800</span></div></div></div>
-                    <div class="tab-pane hidden" data-tab-pane="bbq"><div class="menu-item-card h-full flex flex-col"><img src="https://images.unsplash.com/photo-1529692236671-f1f6b5f46b54?q=80&w=600&auto=format&fit=crop" alt="Beef Seekh Kebab in Multan" class="w-full h-48 object-cover"><div class="p-6 flex-grow flex flex-col"><h3 class="text-2xl mb-2">Seekh Kebab</h3><p class="text-gray-600 mb-4 flex-grow">Minced meat skewers infused with herbs and spices.</p><span class="font-bold text-xl text-yellow-700 mt-4">Rs. 950</span></div></div></div>
-                    <div class="tab-pane hidden" data-tab-pane="bbq"><div class="menu-item-card h-full flex flex-col"><img src="https://placehold.co/600x400/DEB887/333?text=Malai+Boti" alt="Creamy Malai Boti" class="w-full h-48 object-cover"><div class="p-6 flex-grow flex flex-col"><h3 class="text-2xl mb-2">Malai Boti</h3><p class="text-gray-600 mb-4 flex-grow">Creamy, non-spicy chicken pieces, tender and juicy.</p><span class="font-bold text-xl text-yellow-700 mt-4">Rs. 1000</span></div></div></div>
-                    <div class="tab-pane hidden" data-tab-pane="bbq"><div class="menu-item-card h-full flex flex-col"><img src="https://images.unsplash.com/photo-1603133872878-684f208fb84b?q=80&w=600&auto=format&fit=crop" alt="Tandoori Fish Tikka" class="w-full h-48 object-cover"><div class="p-6 flex-grow flex flex-col"><h3 class="text-2xl mb-2">Fish Tikka</h3><p class="text-gray-600 mb-4 flex-grow">Delicate fish marinated in tandoori spices and grilled.</p><span class="font-bold text-xl text-yellow-700 mt-4">Rs. 1500</span></div></div></div>
-                    
-                    <!-- Rice -->
-                    <div class="tab-pane hidden" data-tab-pane="rice"><div class="menu-item-card h-full flex flex-col"><img src="https://images.unsplash.com/photo-1589302168068-964664d93dc0?q=80&w=600&auto=format&fit=crop" alt="Best Chicken Biryani in Multan" class="w-full h-48 object-cover"><div class="p-6 flex-grow flex flex-col"><h3 class="text-2xl mb-2">Chicken Biryani</h3><p class="text-gray-600 mb-4 flex-grow">Aromatic basmati rice with spiced chicken, a national favorite.</p><span class="font-bold text-xl text-yellow-700 mt-4">Rs. 600</span></div></div></div>
-                    <div class="tab-pane hidden" data-tab-pane="rice"><div class="menu-item-card h-full flex flex-col"><img src="https://images.unsplash.com/photo-1630409349884-a59026d1814a?q=80&w=600&auto=format&fit=crop" alt="Traditional Mutton Pulao" class="w-full h-48 object-cover"><div class="p-6 flex-grow flex flex-col"><h3 class="text-2xl mb-2">Mutton Pulao</h3><p class="text-gray-600 mb-4 flex-grow">Subtly flavored rice cooked in rich mutton broth.</p><span class="font-bold text-xl text-yellow-700 mt-4">Rs. 850</span></div></div></div>
-                    <div class="tab-pane hidden" data-tab-pane="rice"><div class="menu-item-card h-full flex flex-col"><img src="https://placehold.co/600x400/228B22/FFF?text=Veg+Pulao" alt="Vegetable Pulao" class="w-full h-48 object-cover"><div class="p-6 flex-grow flex flex-col"><h3 class="text-2xl mb-2">Vegetable Pulao</h3><p class="text-gray-600 mb-4 flex-grow">A medley of fresh vegetables and aromatic rice.</p><span class="font-bold text-xl text-yellow-700 mt-4">Rs. 450</span></div></div></div>
-
-                    <!-- Breads -->
-                    <div class="tab-pane hidden" data-tab-pane="bread"><div class="menu-item-card h-full flex flex-col"><img src="https://placehold.co/600x400/D2691E/FFF?text=Roghni+Naan" alt="Roghni Naan" class="w-full h-48 object-cover"><div class="p-6 flex-grow flex flex-col"><h3 class="text-2xl mb-2">Roghni Naan</h3><p class="text-gray-600 mb-4 flex-grow">Soft, fluffy naan bread brushed with butter and sesame seeds.</p><span class="font-bold text-xl text-yellow-700 mt-4">Rs. 70</span></div></div></div>
-                    <div class="tab-pane hidden" data-tab-pane="bread"><div class="menu-item-card h-full flex flex-col"><img src="https://placehold.co/600x400/DEB887/333?text=Garlic+Naan" alt="Garlic Naan" class="w-full h-48 object-cover"><div class="p-6 flex-grow flex flex-col"><h3 class="text-2xl mb-2">Garlic Naan</h3><p class="text-gray-600 mb-4 flex-grow">Popular flatbread topped with fresh garlic and coriander.</p><span class="font-bold text-xl text-yellow-700 mt-4">Rs. 80</span></div></div></div>
-                    <div class="tab-pane hidden" data-tab-pane="bread"><div class="menu-item-card h-full flex flex-col"><img src="https://placehold.co/600x400/8B4513/FFF?text=Tandoori+Roti" alt="Tandoori Roti" class="w-full h-48 object-cover"><div class="p-6 flex-grow flex flex-col"><h3 class="text-2xl mb-2">Tandoori Roti</h3><p class="text-gray-600 mb-4 flex-grow">Whole wheat bread cooked in a traditional clay tandoor.</p><span class="font-bold text-xl text-yellow-700 mt-4">Rs. 30</span></div></div></div>
+                <div id="menu-items-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                    <!-- Menu items will be dynamically generated by JS -->
                 </div>
             </div>
         </section>
-
-        <!-- Fanan's Specials Section -->
+        
+        <!-- Other sections -->
         <section id="specials" class="py-24" style="background-color: var(--dark-bg); color: var(--text-light);">
             <div class="container mx-auto px-6 reveal">
                 <h2 class="text-4xl md:text-5xl font-display text-center mb-16" style="color: var(--primary-color);">Chef's Signature Dishes</h2>
@@ -246,69 +271,51 @@
                             <span class="font-bold text-2xl" style="color: var(--primary-color);">Rs. 2500</span>
                         </div>
                     </div>
-                    <div class="grid md:grid-cols-2 gap-12 items-center">
-                        <div class="text-center md:text-left md:order-2">
-                            <h3 class="text-3xl md:text-4xl">Lahori Fish Fry</h3>
-                            <p class="text-lg text-gray-400 my-4">A crispy, flaky fish fillet marinated in traditional Lahori spices and fried to golden perfection. A must-try for seafood lovers.</p>
-                            <span class="font-bold text-2xl" style="color: var(--primary-color);">Rs. 2000</span>
-                        </div>
-                        <div class="md:order-1">
-                             <img src="https://placehold.co/800x600/B22222/FFF?text=Lahori+Fish+Fry" class="rounded-lg shadow-2xl w-full h-auto object-cover" alt="Authentic Lahori Fish">
-                        </div>
-                    </div>
                 </div>
-            </div>
-        </section>
-        
-        <!-- Gallery Section -->
-        <section id="gallery" class="py-24 bg-white">
-            <div class="container mx-auto px-6 reveal">
-                <h2 class="text-4xl md:text-5xl font-display text-center mb-12">A Glimpse of Fanan</h2>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="grid gap-4">
-                        <div><img class="h-auto max-w-full rounded-lg shadow-md transition-transform duration-300 hover:scale-105" src="https://images.unsplash.com/photo-1574484284000-0191a339f400?q=80&w=600&auto=format&fit=crop" alt="gallery image of food"></div>
-                        <div><img class="h-auto max-w-full rounded-lg shadow-md transition-transform duration-300 hover:scale-105" src="https://images.unsplash.com/photo-1598214886806-c87b84b7078b?q=80&w=600&auto=format&fit=crop" alt="gallery image of biryani"></div>
-                    </div>
-                    <div class="grid gap-4">
-                        <div><img class="h-auto max-w-full rounded-lg shadow-md transition-transform duration-300 hover:scale-105" src="https://images.unsplash.com/photo-1551782450-a2132b4ba21d?q=80&w=600&auto=format&fit=crop" alt="gallery image of a burger"></div>
-                        <div><img class="h-auto max-w-full rounded-lg shadow-md transition-transform duration-300 hover:scale-105" src="https://images.unsplash.com/photo-1626078299022-53c828be9344?q=80&w=600&auto=format&fit=crop" alt="gallery image of seekh kebabs"></div>
-                    </div>
-                    <div class="grid gap-4">
-                        <div><img class="h-auto max-w-full rounded-lg shadow-md transition-transform duration-300 hover:scale-105" src="https://images.unsplash.com/photo-1625944022823-38c4d289745e?q=80&w=600&auto=format&fit=crop" alt="gallery image of lassi drink"></div>
-                        <div><img class="h-auto max-w-full rounded-lg shadow-md transition-transform duration-300 hover:scale-105" src="https://images.unsplash.com/photo-1606491956392-50605335a4d3?q=80&w=600&auto=format&fit=crop" alt="gallery image of a restaurant interior"></div>
-                    </div>
-                     <div class="grid gap-4">
-                        <div><img class="h-auto max-w-full rounded-lg shadow-md transition-transform duration-300 hover:scale-105" src="https://images.unsplash.com/photo-1567188042799-a4d9c79a2392?q=80&w=600&auto=format&fit=crop" alt="gallery image of spices"></div>
-                        <div><img class="h-auto max-w-full rounded-lg shadow-md transition-transform duration-300 hover:scale-105" src="https://images.unsplash.com/photo-1628294896516-3441313c4375?q=80&w=600&auto=format&fit=crop" alt="gallery image of food preparation"></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Reviews Section -->
-        <section id="reviews" class="py-24">
-             <div class="container mx-auto px-6 reveal">
-                 <h2 class="text-4xl md:text-5xl font-display text-center mb-12">What Our Customers Say</h2>
-                 <div class="grid md:grid-cols-3 gap-8">
-                    <div class="bg-white p-8 rounded-lg shadow-lg text-center">
-                        <p class="text-gray-600 mb-4 italic">"The best Chicken Karahi I've had in Multan! The taste was authentic and the service was excellent. Highly recommended for families."</p>
-                        <p class="font-bold text-yellow-700">- Ahmed Raza</p>
-                    </div>
-                    <div class="bg-white p-8 rounded-lg shadow-lg text-center">
-                        <p class="text-gray-600 mb-4 italic">"Fanan Restaurant is our go-to place for desi food. Their Mutton Ribs are to die for! Consistently amazing quality."</p>
-                        <p class="font-bold text-yellow-700">- Fatima Khan</p>
-                    </div>
-                    <div class="bg-white p-8 rounded-lg shadow-lg text-center">
-                        <p class="text-gray-600 mb-4 italic">"A wonderful ambiance and even better food. The BBQ platter is perfect for sharing. We had a great time."</p>
-                        <p class="font-bold text-yellow-700">- Usman Ali</p>
-                    </div>
-                 </div>
             </div>
         </section>
 
     </main>
 
-    <!-- Footer -->
+    <!-- Floating Cart Button -->
+    <button id="floating-cart-button" class="bg-yellow-500 text-white p-4 rounded-full shadow-lg relative transform hover:scale-110 transition-transform">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+        <span id="cart-count" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center hidden">0</span>
+    </button>
+    
+    <!-- Add to Cart Toast Notification -->
+    <div id="toast-notification" class="bg-gray-800 text-white py-2 px-6 rounded-full shadow-lg">
+        <p id="toast-message"></p>
+    </div>
+
+    <!-- Cart Panel -->
+    <div id="cart-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden"></div>
+    <div id="cart-panel" class="fixed top-0 right-0 w-full max-w-md h-full bg-white z-50 shadow-2xl transform translate-x-full flex flex-col">
+        <div class="flex justify-between items-center p-4 border-b">
+            <h2 class="text-2xl font-display">Aapka Cart</h2>
+            <button id="cart-close-button" class="p-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+        </div>
+        <div id="cart-items" class="flex-grow p-4 overflow-y-auto">
+            <!-- Cart items will be generated here -->
+            <p id="empty-cart-msg" class="text-center text-gray-500">Aapka cart khaali hai.</p>
+        </div>
+        <!-- AI Suggestion Area -->
+        <div id="ai-suggestion-area" class="p-4 border-t hidden">
+             <button id="suggestion-button" class="w-full btn btn-ai mb-4">Perfect Drink Suggestion ✨</button>
+             <div id="suggestion-result" class="text-center"></div>
+        </div>
+        <div class="p-4 border-t bg-gray-50">
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-xl font-bold">Total</span>
+                <span id="cart-total" class="text-xl font-bold text-yellow-700">Rs. 0</span>
+            </div>
+            <button id="checkout-button" class="w-full btn btn-primary">Place Order</button>
+        </div>
+    </div>
+
+    <!-- Footer etc. -->
     <footer id="contact" class="bg-gray-900 text-white py-20">
         <div class="container mx-auto px-6 text-center reveal">
             <h2 class="text-4xl font-display mb-4">Visit or Call Us</h2>
@@ -326,70 +333,336 @@
                     </div>
                 </div>
             </div>
-             <p class="text-sm mt-12 text-gray-500">&copy; <span id="year"></span> Fanan Family Restaurant. Designed by Ali Asghar Virk.</p>
+             <p class="text-sm mt-12 text-gray-500">&copy; <span id="year"></span> Fanan Family Restaurant. Designed with Passion.</p>
         </div>
     </footer>
 
     <script>
-        // --- Menu Tabs Functionality ---
+    document.addEventListener('DOMContentLoaded', function () {
+        // --- Globals ---
+        let cart = [];
+        const menuItemsContainer = document.getElementById('menu-items-container');
         const tabButtons = document.querySelectorAll('.tab-button');
-        const allPanes = document.querySelectorAll('.tab-pane');
+        
+        // --- Menu Data ---
+        const menuData = {
+            deals: [
+                { id: 'D01', name: 'Shahi Deal', desc: 'Half Chicken, 2 Tikka Boti, 2 Chk Kabab, Half Saji w/Rice, 4 Roti, Salad, Raita.', price: 2599, img: 'https://placehold.co/600x400/c08401/FFF?text=Shahi+Deal', type: 'food' },
+                { id: 'D02', name: '4 Person Platter', desc: '4 Pizza Kabab, 4 Labanese Kabab, 4 Qalmi Tikka, 4 Malai Boti, Full Afghani Pulao.', price: 3390, img: 'https://placehold.co/600x400/c08401/FFF?text=4+Person+Platter', type: 'food' },
+                { id: 'D03', name: 'Student Deal', desc: '2 Chicken Kabab, 4 Tikka Boti, 1/4 Chk Karahi, Rice, Raita, 4 Roti, 1 Ltr Drink.', price: 1699, img: 'https://placehold.co/600x400/c08401/FFF?text=Student+Deal', type: 'food' }
+            ],
+            salan: [
+                { id: 'S01', name: 'Chicken Karahi', desc: 'Classic wok-cooked dish with rich tomato and ginger gravy.', price: 1200, img: 'https://images.unsplash.com/photo-1631515243349-e0cb75fb8da7?q=80&w=600&auto=format&fit=crop', type: 'food' },
+                { id: 'S02', name: 'Mutton Korma', desc: 'Tender mutton in a creamy, spiced yogurt sauce.', price: 1800, img: 'https://images.unsplash.com/photo-1629548489387-2795b861aa84?q=80&w=600&auto=format&fit=crop', type: 'food' },
+                { id: 'S03', name: 'Palak Paneer', desc: 'Soft cheese cubes in a flavourful spinach gravy.', price: 900, img: 'https://images.unsplash.com/photo-1585937421612-70a0583562be?q=80&w=600&auto=format&fit=crop', type: 'food' },
+                { id: 'S04', name: 'Daal Maash Fry', desc: 'Creamy white lentils fried with onions, garlic, and spices.', price: 750, img: 'https://placehold.co/600x400/8B4513/FFF?text=Daal+Maash', type: 'food' }
+            ],
+            bbq: [
+                { id: 'B01', name: 'Chicken Tikka Boti', desc: 'Spicy, marinated chicken chunks grilled to perfection.', price: 800, img: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?q=80&w=600&auto=format&fit=crop', type: 'food' },
+                { id: 'B02', name: 'Seekh Kebab', desc: 'Minced meat skewers infused with herbs and spices.', price: 950, img: 'https://images.unsplash.com/photo-1529692236671-f1f6b5f46b54?q=80&w=600&auto=format&fit=crop', type: 'food' },
+                { id: 'B03', name: 'Malai Boti', desc: 'Creamy, non-spicy chicken pieces, tender and juicy.', price: 1000, img: 'https://placehold.co/600x400/DEB887/333?text=Malai+Boti', type: 'food' },
+                { id: 'B04', name: 'Fish Tikka', desc: 'Delicate fish marinated in tandoori spices and grilled.', price: 1500, img: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?q=80&w=600&auto=format&fit=crop', type: 'food' }
+            ],
+            rice: [
+                { id: 'R01', name: 'Chicken Biryani', desc: 'Aromatic basmati rice with spiced chicken, a national favorite.', price: 600, img: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?q=80&w=600&auto=format&fit=crop', type: 'food' },
+                { id: 'R02', name: 'Mutton Pulao', desc: 'Subtly flavored rice cooked in rich mutton broth.', price: 850, img: 'https://images.unsplash.com/photo-1630409349884-a59026d1814a?q=80&w=600&auto=format&fit=crop', type: 'food' },
+            ],
+             beverages: [
+                { id: 'V01', name: 'Sweet Lassi', desc: 'Refreshing and creamy sweet yogurt-based drink.', price: 200, img: 'https://placehold.co/600x400/E6E6FA/333?text=Lassi', type: 'drink' },
+                { id: 'V02', name: 'Mint Margarita', desc: 'A zesty and cool slushy perfect for Multan\'s heat.', price: 250, img: 'https://placehold.co/600x400/98FB98/333?text=Margarita', type: 'drink' },
+                { id: 'V03', name: 'Soft Drink', desc: 'Chilled carbonated soft drinks.', price: 100, img: 'https://placehold.co/600x400/FF6347/FFF?text=Soft+Drink', type: 'drink' },
+                { id: 'V04', name: 'Mineral Water', desc: 'Pure and refreshing mineral water.', price: 80, img: 'https://placehold.co/600x400/87CEEB/FFF?text=Water', type: 'drink' }
+            ],
+            bread: [
+                { id: 'N01', name: 'Roghni Naan', desc: 'Soft, fluffy naan bread brushed with butter and sesame seeds.', price: 70, img: 'https://placehold.co/600x400/D2691E/FFF?text=Roghni+Naan', type: 'food' },
+                { id: 'N02', name: 'Garlic Naan', desc: 'Popular flatbread topped with fresh garlic and coriander.', price: 80, img: 'https://placehold.co/600x400/DEB887/333?text=Garlic+Naan', type: 'food' },
+                { id: 'N03', name: 'Tandoori Roti', desc: 'Whole wheat bread cooked in a traditional clay tandoor.', price: 30, img: 'https://placehold.co/600x400/8B4513/FFF?text=Tandoori+Roti', type: 'food' }
+            ]
+        };
+
+        // --- UI Elements ---
+        const cartPanel = document.getElementById('cart-panel');
+        const cartOverlay = document.getElementById('cart-overlay');
+        const cartItemsContainer = document.getElementById('cart-items');
+        const emptyCartMsg = document.getElementById('empty-cart-msg');
+        const cartTotalEl = document.getElementById('cart-total');
+        const toastEl = document.getElementById('toast-notification');
+        const toastMessageEl = document.getElementById('toast-message');
+        const aiSuggestionArea = document.getElementById('ai-suggestion-area');
+        const suggestionButton = document.getElementById('suggestion-button');
+        const suggestionResultEl = document.getElementById('suggestion-result');
+        
+        // --- Toast Notification Logic ---
+        function showToast(message) {
+            toastMessageEl.textContent = message;
+            toastEl.classList.add('show');
+            setTimeout(() => {
+                toastEl.classList.remove('show');
+            }, 3000); // Hide after 3 seconds
+        }
+
+        // --- Cart Logic ---
+        function addToCart(itemId, showMsg = true) {
+            const existingItem = cart.find(item => item.id === itemId);
+            let itemName = '';
+            
+            if (existingItem) {
+                existingItem.quantity++;
+                itemName = existingItem.name;
+            } else {
+                let itemToAdd;
+                for (const category in menuData) {
+                    const found = menuData[category].find(item => item.id === itemId);
+                    if (found) {
+                        itemToAdd = { ...found, quantity: 1 };
+                        break;
+                    }
+                }
+                if (itemToAdd) {
+                    cart.push(itemToAdd);
+                    itemName = itemToAdd.name;
+                }
+            }
+            if(showMsg) showToast(`'${itemName}' cart mein add ho gaya hai!`);
+            updateCart();
+        }
+
+        function updateQuantity(itemId, change) {
+            const itemInCart = cart.find(item => item.id === itemId);
+            if (itemInCart) {
+                itemInCart.quantity += change;
+                if (itemInCart.quantity <= 0) {
+                    cart = cart.filter(item => item.id !== itemId);
+                }
+            }
+            updateCart();
+        }
+
+        function updateCart() {
+            renderCartItems();
+            updateCartTotal();
+            updateCartCount();
+            toggleAiSuggestion();
+        }
+
+        function renderCartItems() {
+            cartItemsContainer.innerHTML = '';
+            if (cart.length === 0) {
+                cartItemsContainer.appendChild(emptyCartMsg);
+                emptyCartMsg.style.display = 'block';
+                return;
+            }
+            emptyCartMsg.style.display = 'none';
+            cart.forEach(item => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'flex items-center justify-between mb-4';
+                itemEl.innerHTML = `
+                    <div class="flex items-center">
+                        <img src="${item.img}" alt="${item.name}" class="w-16 h-16 object-cover rounded-md mr-4">
+                        <div>
+                            <p class="font-bold">${item.name}</p>
+                            <p class="text-sm text-gray-600">Rs. ${item.price}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <button class="cart-item-quantity-btn" onclick="updateQuantity('${item.id}', -1)">-</button>
+                        <span class="px-3 font-bold">${item.quantity}</span>
+                        <button class="cart-item-quantity-btn" onclick="updateQuantity('${item.id}', 1)">+</button>
+                    </div>
+                `;
+                cartItemsContainer.appendChild(itemEl);
+            });
+        }
+        
+        window.updateQuantity = updateQuantity; // Make it globally accessible
+
+        function updateCartTotal() {
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            cartTotalEl.textContent = `Rs. ${total}`;
+        }
+
+        function updateCartCount() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const countEl = document.getElementById('cart-count');
+            if (totalItems > 0) {
+                countEl.textContent = totalItems;
+                countEl.classList.remove('hidden');
+            } else {
+                countEl.classList.add('hidden');
+            }
+        }
+        
+        function toggleCart() {
+            cartPanel.classList.toggle('translate-x-full');
+            cartOverlay.classList.toggle('hidden');
+            // document.body.classList.toggle('overflow-hidden');
+        }
+
+        // --- AI Suggestion Logic ---
+        function toggleAiSuggestion() {
+            const hasFoodItems = cart.some(item => item.type === 'food');
+            if(hasFoodItems) {
+                aiSuggestionArea.classList.remove('hidden');
+            } else {
+                aiSuggestionArea.classList.add('hidden');
+                suggestionResultEl.innerHTML = ''; // Clear previous suggestion
+            }
+        }
+
+        async function getDrinkSuggestion() {
+            suggestionButton.disabled = true;
+            suggestionResultEl.innerHTML = `<p class="text-gray-500">Aapke liye behtareen drink dhoond rahay hain...</p>`;
+
+            const foodItems = cart.filter(item => item.type === 'food').map(item => item.name).join(', ');
+            const drinkOptions = menuData.beverages.map(drink => drink.name).join(', ');
+            
+            const prompt = `You are a helpful restaurant assistant for 'Fanan Family Restaurant', which serves spicy and rich Pakistani food. A customer has the following items in their cart: ${foodItems}. Based on these items, suggest the single best beverage to pair with their meal from the following available options: ${drinkOptions}. Provide your response as a valid JSON object with two keys: "drinkName" (the exact name of the suggested drink from the list) and "reason" (a short, fun, one-sentence reason in Hindi (Latin) explaining why it's a good pairing). Example: {"drinkName": "Sweet Lassi", "reason": "Is masaledar khane ke baad thandi lassi ka maza hi kuch aur hai!"}`;
+            
+            try {
+                 let chatHistory = [];
+                 chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                 const payload = { contents: chatHistory };
+                 const apiKey = "" 
+                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                 const response = await fetch(apiUrl, {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify(payload)
+                 });
+                 const result = await response.json();
+                
+                 if (result.candidates && result.candidates.length > 0) {
+                    const textResponse = result.candidates[0].content.parts[0].text;
+                    const jsonResponse = JSON.parse(textResponse);
+                    const suggestedDrink = menuData.beverages.find(d => d.name === jsonResponse.drinkName);
+                    if(suggestedDrink) {
+                        renderSuggestion(suggestedDrink, jsonResponse.reason);
+                    } else {
+                         throw new Error("Suggested drink not found in menu.");
+                    }
+                 } else {
+                    throw new Error("No suggestion received from AI.");
+                 }
+
+            } catch(error) {
+                console.error("Gemini API Error:", error);
+                suggestionResultEl.innerHTML = `<p class="text-red-500">Maaf kijiyega, abhi suggestion nahi de sakte.</p>`;
+            } finally {
+                suggestionButton.disabled = false;
+            }
+        }
+        
+        function renderSuggestion(drink, reason) {
+             suggestionResultEl.innerHTML = `
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                    <p class="font-semibold text-gray-700">Hamari Salah:</p>
+                    <div class="flex items-center my-2">
+                        <img src="${drink.img}" alt="${drink.name}" class="w-12 h-12 rounded-full object-cover mr-3">
+                        <div>
+                            <p class="font-bold text-lg text-yellow-800">${drink.name}</p>
+                            <p class="text-sm text-gray-600 italic">"${reason}"</p>
+                        </div>
+                    </div>
+                    <button class="w-full btn btn-secondary text-sm mt-2" onclick="addSuggestedToCart('${drink.id}')">Isko bhi add karein</button>
+                </div>
+            `;
+        }
+
+        window.addSuggestedToCart = (itemId) => {
+            addToCart(itemId);
+            suggestionResultEl.innerHTML = `<p class="text-green-600 font-semibold">Behtareen! Cart mein add ho gaya.</p>`;
+        };
+
+        suggestionButton.addEventListener('click', getDrinkSuggestion);
+
+
+        // --- Event Listeners for Cart ---
+        [document.getElementById('floating-cart-button'), document.getElementById('cart-close-button'), cartOverlay].forEach(el => {
+            el.addEventListener('click', toggleCart);
+        });
+
+        document.getElementById('checkout-button').addEventListener('click', () => {
+            if(cart.length > 0) {
+                alert('Aapka order wasool ho gaya hai! Jald hi aapse raabta kiya jayega.');
+                cart = [];
+                updateCart();
+                toggleCart();
+            } else {
+                alert('Order karne ke liye pehle cart mein kuch daalein.');
+            }
+        });
+
+
+        // --- Menu Rendering Logic ---
+        function renderMenuItems(category) {
+            menuItemsContainer.innerHTML = '';
+            const items = menuData[category];
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'menu-item-card h-full flex flex-col';
+                card.innerHTML = `
+                    <img src="${item.img}" alt="${item.name}" class="w-full h-48 object-cover">
+                    <div class="p-4 md:p-6 flex-grow flex flex-col">
+                        <h3 class="text-xl md:text-2xl mb-2">${item.name}</h3>
+                        <p class="text-gray-600 mb-4 flex-grow text-sm">${item.desc}</p>
+                        <div class="flex justify-between items-center mt-4">
+                            <span class="font-bold text-lg md:text-xl text-yellow-700">Rs. ${item.price}</span>
+                            <button class="btn btn-secondary text-sm" data-item-id="${item.id}">Add to Cart</button>
+                        </div>
+                    </div>
+                `;
+                menuItemsContainer.appendChild(card);
+            });
+             // Add event listeners to the new buttons
+            menuItemsContainer.querySelectorAll('[data-item-id]').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const itemId = e.target.dataset.itemId;
+                    addToCart(itemId);
+                });
+            });
+        }
 
         tabButtons.forEach(button => {
             button.addEventListener('click', () => {
                 tabButtons.forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
-
-                const targetTab = button.getAttribute('data-tab');
-
-                allPanes.forEach(pane => {
-                    if (pane.getAttribute('data-tab-pane') === targetTab) {
-                        pane.classList.remove('hidden');
-                    } else {
-                        pane.classList.add('hidden');
-                    }
-                });
+                renderMenuItems(button.dataset.tab);
             });
         });
+
+        renderMenuItems('deals'); // Initial render
         
-        // --- Animate on Scroll ---
+        
+        // --- Mobile Menu Toggle ---
+        const menuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const openIcon = document.getElementById('menu-open-icon');
+        const closeIcon = document.getElementById('menu-close-icon');
+        const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+        
+        function toggleMobileMenu() {
+            mobileMenu.classList.toggle('-translate-x-full');
+            openIcon.classList.toggle('hidden');
+            closeIcon.classList.toggle('hidden');
+        }
+        
+        menuButton.addEventListener('click', toggleMobileMenu);
+        mobileNavLinks.forEach(link => link.addEventListener('click', toggleMobileMenu));
+        
+
+        // --- Animation and Other JS ---
+        const revealElements = document.querySelectorAll(".reveal");
         function reveal() {
-            var reveals = document.querySelectorAll(".reveal");
-            for (var i = 0; i < reveals.length; i++) {
-                var windowHeight = window.innerHeight;
-                var elementTop = reveals[i].getBoundingClientRect().top;
-                var elementVisible = 100; // Animate a bit sooner
-                if (elementTop < windowHeight - elementVisible) {
-                    reveals[i].classList.add("active");
+            for (let i = 0; i < revealElements.length; i++) {
+                if (revealElements[i].getBoundingClientRect().top < window.innerHeight - 100) {
+                    revealElements[i].classList.add("active");
                 }
             }
         }
         window.addEventListener("scroll", reveal);
-        // Initial check
         reveal();
-        
-        // --- Active Nav Link on Scroll ---
-        const sections = document.querySelectorAll('section');
-        const navLi = document.querySelectorAll('nav a');
-        window.addEventListener('scroll', ()=> {
-            let current = '';
-            sections.forEach( section => {
-                const sectionTop = section.offsetTop;
-                if(pageYOffset >= sectionTop - 60){
-                    current = section.getAttribute('id');
-                }
-            })
-            navLi.forEach( a => {
-                a.classList.remove('active');
-                if(a.getAttribute('href') == '#'+current){
-                    a.classList.add('active');
-                }
-            })
-        });
-
-        // --- Set current year in footer ---
         document.getElementById('year').textContent = new Date().getFullYear();
+    });
     </script>
-
 </body>
 </html>
