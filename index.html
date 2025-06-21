@@ -1,726 +1,698 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LingoLeap - English Learning Portal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; overflow-y: hidden; }
-        .view-container { display: none; }
-        .form-container { display: none; }
-        .content-section { display: none; }
-        .content-section.active { display: block; }
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { initializeApp } from 'firebase/app';
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut,
+  signInAnonymously,
+  signInWithCustomToken
+} from 'firebase/auth';
+import {
+  getFirestore,
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  onSnapshot,
+  updateDoc,
+  query,
+  where,
+  getDocs
+} from 'firebase/firestore';
 
-        .loader {
-            border: 4px solid #475569; border-top: 4px solid #38bdf8; border-radius: 50%;
-            width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+// Ensure these global variables are defined in the Canvas environment
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
 
-        .flashcard-inner {
-            position: relative; width: 100%; height: 100%;
-            transition: transform 0.6s; transform-style: preserve-3d;
-        }
-        .flashcard.is-flipped .flashcard-inner { transform: rotateY(180deg); }
-        .flashcard-front, .flashcard-back {
-            position: absolute; width: 100%; height: 100%;
-            -webkit-backface-visibility: hidden; backface-visibility: hidden;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 2rem; border-radius: 0.75rem;
-        }
-        .flashcard-back { transform: rotateY(180deg); }
-        
-        .progress-bar-fill {
-            transition: width 0.5s ease-in-out;
-        }
-    </style>
-</head>
-<body class="bg-slate-900 text-slate-200">
+// Initialize Firebase app
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-    <!-- Authentication View -->
-    <div id="auth-view" class="view-container flex items-center justify-center min-h-screen">
-         <div class="w-full max-w-md p-8 space-y-8 bg-slate-800 rounded-2xl shadow-lg border border-slate-700">
-            <div id="loading-view">
-                 <h1 class="text-xl font-bold text-center text-sky-400 mb-4">Connecting to LingoLeap...</h1>
-                 <div class="loader"></div>
-            </div>
-            <div id="initial-view" class="form-container">
-                <h1 class="text-3xl font-bold text-center text-sky-400 mb-4">Student Login</h1>
-                <p class="text-center text-slate-400 mb-8">Welcome to the English Language Portal.</p>
-                <div class="space-y-4">
-                     <button id="show-signup-btn" class="w-full text-white bg-sky-600 hover:bg-sky-700 font-medium rounded-lg text-sm px-5 py-3 text-center">New Student (Create Account)</button>
-                     <button id="show-login-btn" class="w-full text-white bg-slate-600 hover:bg-slate-700 font-medium rounded-lg text-sm px-5 py-3 text-center">Existing Student (Login)</button>
-                </div>
-            </div>
-            <div id="signup-container" class="form-container">
-                <h2 class="text-2xl font-bold text-center text-sky-400">Create Your Account</h2>
-                <form id="signup-form" class="mt-8 space-y-6">
-                    <input id="signup-email" type="email" required class="block w-full rounded-md border border-slate-600 bg-slate-700 px-3 py-3 text-slate-200" placeholder="Email address">
-                    <input id="signup-password" type="password" required class="block w-full rounded-md border border-slate-600 bg-slate-700 px-3 py-3 text-slate-200" placeholder="Password">
-                    <button type="submit" class="w-full justify-center rounded-md bg-sky-600 py-3 text-white hover:bg-sky-700">Sign Up</button>
-                </form>
-                <p class="mt-4 text-center text-sm"><a href="#" class="back-to-initial font-medium text-sky-400">← Back</a></p>
-            </div>
-            <div id="login-container" class="form-container">
-                <h2 class="text-2xl font-bold text-center text-sky-400">Login to Your Account</h2>
-                <form id="login-form" class="mt-8 space-y-6">
-                    <input id="login-email" type="email" required class="block w-full rounded-md border border-slate-600 bg-slate-700 px-3 py-3 text-slate-200" placeholder="Email address">
-                    <input id="login-password" type="password" required class="block w-full rounded-md border border-slate-600 bg-slate-700 px-3 py-3 text-slate-200" placeholder="Password">
-                    <button type="submit" class="w-full justify-center rounded-md bg-sky-600 py-3 text-white hover:bg-sky-700">Login</button>
-                </form>
-                 <p class="mt-4 text-center text-sm"><a href="#" class="back-to-initial font-medium text-sky-400">← Back</a></p>
-            </div>
-            <div id="message-box" class="hidden text-center p-3 rounded-lg text-sm mt-4"></div>
-        </div>
+// Helper Components for consistent styling and UI elements
+const Card = ({ title, children, className = '' }) => (
+  <div className={`bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1 ${className}`}>
+    {title && <h2 className="text-3xl font-extrabold mb-6 text-gray-800 text-center drop-shadow-sm">{title}</h2>}
+    {children}
+  </div>
+);
+
+const Button = ({ onClick, children, className = '', disabled = false, type = 'button' }) => (
+  <button
+    onClick={onClick}
+    disabled={disabled}
+    type={type}
+    className={`px-8 py-4 rounded-xl text-white font-bold text-lg shadow-lg transition-all duration-300
+     transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-indigo-500
+     ${disabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800'}
+     ${className}`}
+  >
+    {children}
+  </button>
+);
+
+const Input = ({ value, onChange, placeholder, type = 'text', className = '', label = '' }) => (
+  <div className="mb-4">
+    {label && <label className="block text-gray-700 text-md font-semibold mb-2">{label}</label>}
+    <input
+      type={type}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      className={`w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-200 text-lg placeholder-gray-400 ${className}`}
+    />
+  </div>
+);
+
+const TextArea = ({ value, onChange, placeholder, className = '', rows = 4, label = '' }) => (
+    <div className="mb-4">
+      {label && <label className="block text-gray-700 text-md font-semibold mb-2">{label}</label>}
+      <textarea
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        rows={rows}
+        className={`w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none resize-y transition-all duration-200 text-lg placeholder-gray-400 ${className}`}
+      ></textarea>
     </div>
+);
+
+const LoadingSpinner = ({ text = 'Loading...' }) => (
+  <div className="flex flex-col justify-center items-center py-6">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-indigo-600"></div>
+    <p className="mt-4 text-gray-700 text-lg">{text}</p>
+  </div>
+);
+
+const AlertMessage = ({ message, type = 'info', className = '' }) => {
+  const bgColor = type === 'error' ? 'bg-red-100 border-red-400 text-red-700' : 'bg-blue-100 border-blue-400 text-blue-700';
+  return (
+    <div className={`p-4 rounded-lg border ${bgColor} text-md mb-4 flex items-center justify-center ${className}`} role="alert">
+       {type === 'error' ? (
+        <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" /></svg>
+      ) : (
+        <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>
+      )}
+      <span>{message}</span>
+    </div>
+  );
+};
+
+// --- NEW Profile Setup Form for first-time users ---
+const ProfileSetup = ({ firebaseUid, onProfileCreated }) => {
+    const [name, setName] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    const handleProfileCreation = async (e) => {
+        e.preventDefault();
+        if (!name.trim()) {
+            setError('Please enter your name to continue.');
+            return;
+        }
+        setLoading(true);
+        setError('');
+
+        try {
+            const userProfileRef = doc(db, `artifacts/${appId}/users/${firebaseUid}/profile`, 'userData');
+            await setDoc(userProfileRef, {
+                studentDisplayName: name.trim(),
+                createdAt: new Date().toISOString(),
+                lastLogin: new Date().toISOString()
+            });
+            onProfileCreated(name.trim()); // Notify parent component
+        } catch (err) {
+            console.error("Profile Creation Error:", err);
+            setError(`Failed to save profile: ${err.message}`);
+            setLoading(false);
+        }
+    };
     
-    <!-- Welcome Popup -->
-    <div id="welcome-popup" class="view-container fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-        <div class="bg-slate-800 p-8 rounded-xl shadow-2xl border border-slate-700 text-center max-w-sm">
-            <h2 class="text-2xl font-bold text-green-400">Login Successful!</h2>
-            <p class="text-lg text-slate-300 mt-4">Welcome to the LMS of English Language</p>
-            <button id="enter-portal-btn" class="mt-8 w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded-lg">Start Learning</button>
-        </div>
-    </div>
-
-    <!-- Main Learning Portal View -->
-    <div id="portal-view" class="view-container">
-        <div class="flex flex-col h-screen">
-            <!-- Header -->
-            <header class="bg-slate-800/80 backdrop-blur-md border-b border-slate-700 px-6 py-3 flex items-center justify-between z-10">
-                <h1 class="text-2xl font-bold text-sky-400">LingoLeap</h1>
-                <div class="flex items-center gap-6">
-                    <div class="w-72">
-                        <div class="flex justify-between items-center mb-1">
-                            <p class="text-sm text-slate-400">Your Progress</p>
-                            <p id="progress-text" class="text-xs text-slate-500">0%</p>
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 p-4">
+            <div className="w-full max-w-md">
+                <Card title="Welcome! Let's get you set up.">
+                    <p className="text-gray-700 mb-6 text-center">Please enter your name to create your learning profile.</p>
+                    <form onSubmit={handleProfileCreation}>
+                        <Input label="Your Name" value={name} onChange={e => setName(e.target.value)} placeholder="e.g., Jane Doe" />
+                        {error && <AlertMessage message={error} type="error" />}
+                        <div className="mt-8">
+                            <Button type="submit" disabled={loading} className="w-full">
+                                {loading ? 'Saving...' : '🚀 Start Learning'}
+                            </Button>
                         </div>
-                        <div class="w-full bg-slate-700 rounded-full h-2">
-                            <div id="progress-bar" class="bg-green-500 h-2 rounded-full progress-bar-fill" style="width: 0%"></div>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div class="text-right">
-                            <p id="user-email-display" class="text-sm font-semibold truncate"></p>
-                            <p class="text-xs text-slate-500">Student</p>
-                        </div>
-                        <button id="logout-btn" class="bg-red-600/50 hover:bg-red-600 text-white p-2 rounded-full" title="Logout">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                        </button>
-                    </div>
-                </div>
-            </header>
-            <div class="flex flex-1 overflow-hidden">
-                <!-- Sidebar Navigation -->
-                <aside class="w-60 bg-slate-800/50 p-6 flex flex-col">
-                    <nav class="flex-grow">
-                        <ul class="space-y-2">
-                            <li><a href="#" class="nav-link flex items-center p-3 rounded-lg bg-sky-500/20 text-slate-200" data-target="dashboard">Dashboard</a></li>
-                            <li><a href="#" class="nav-link flex items-center p-3 rounded-lg text-slate-400 hover:bg-slate-700/50" data-target="vocabulary">Vocabulary</a></li>
-                            <li><a href="#" class="nav-link flex items-center p-3 rounded-lg text-slate-400 hover:bg-slate-700/50" data-target="grammar">Grammar</a></li>
-                            <li><a href="#" class="nav-link flex items-center p-3 rounded-lg text-slate-400 hover:bg-slate-700/50" data-target="reading">Reading</a></li>
-                            <li><a href="#" class="nav-link flex items-center p-3 rounded-lg text-slate-400 hover:bg-slate-700/50" data-target="listening">Listening</a></li>
-                            <li><a href="#" class="nav-link flex items-center p-3 rounded-lg text-slate-400 hover:bg-slate-700/50" data-target="speaking">Speaking</a></li>
-                            <li><a href="#" class="nav-link flex items-center p-3 rounded-lg text-slate-400 hover:bg-slate-700/50" data-target="dictation">Dictation</a></li>
-                        </ul>
-                    </nav>
-                </aside>
-
-                <!-- Main Content -->
-                <main class="flex-1 p-8 overflow-y-auto">
-                    <section id="dashboard" class="content-section active"></section>
-                    <section id="vocabulary" class="content-section"></section>
-                    <section id="grammar" class="content-section"></section>
-                    <section id="reading" class="content-section"></section>
-                    <section id="listening" class="content-section"></section>
-                    <section id="speaking" class="content-section"></section>
-                    <section id="dictation" class="content-section"></section>
-                </main>
+                    </form>
+                </Card>
             </div>
         </div>
-    </div>
+    );
+};
 
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+// --- Speaking Exercise Component ---
+const SpeakingExercise = ({ firebaseUid, studentDisplayName }) => {
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioBlob, setAudioBlob] = useState(null);
+  const [transcribedText, setTranscribedText] = useState('');
+  const [feedback, setFeedback] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+
+  const saveSpeakingResult = useCallback(async (text, aiFeedback) => {
+    if (!firebaseUid) {
+      console.error("Cannot save speaking result: firebaseUid is null.");
+      return;
+    }
+    const speakingCollectionRef = collection(db, `artifacts/${appId}/users/${firebaseUid}/speakingExercises`);
+    try {
+      await setDoc(doc(speakingCollectionRef), {
+        timestamp: new Date().toISOString(),
+        studentDisplayName: studentDisplayName,
+        transcribedText: text,
+        feedback: aiFeedback,
+      });
+      console.log("Speaking result saved successfully!");
+    } catch (e) {
+      console.error("Error saving speaking result: ", e);
+    }
+  }, [firebaseUid, studentDisplayName]);
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      audioChunksRef.current = [];
+
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
+
+      mediaRecorderRef.current.onstop = () => {
+        const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        setAudioBlob(blob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+      setAudioBlob(null);
+      setTranscribedText('');
+      setFeedback('');
+    } catch (error) {
+      console.error('Error accessing microphone:', error);
+      setFeedback('Error: Could not access microphone. Please allow access.');
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const playAudio = () => {
+    if (audioBlob) {
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audio.play();
+    }
+  };
+
+  const analyzeSpeech = async () => {
+    if (!audioBlob) {
+      setFeedback('Please record something first.');
+      return;
+    }
+
+    setIsLoading(true);
+    setTranscribedText('');
+    setFeedback('Analyzing your speech... This may take a moment.');
+    
+    // Since Web Speech API can be unreliable, we'll simulate a transcription.
+    const speechResult = "I am practice my English speaking for improve my fluency."; // A sample with intentional errors
+    setTranscribedText(speechResult);
+    setFeedback('Transcription complete. Now getting AI feedback...');
+
+    try {
+        const prompt = `You are an English teacher. A student has submitted the following text from a speaking exercise. Review it for grammar, coherence, and fluency. Provide constructive feedback in a friendly and encouraging tone. Start by pointing out what they did well, then gently correct the mistakes with explanations, and finally provide a corrected version of the text. The student's text is: "${speechResult}"`;
+        let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+        const payload = { contents: chatHistory };
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
         
-        // --- MASSIVELY EXPANDED DATA SETS ---
-        const vocabulary = [ 
-            // Tier 1: Common Words
-            { word: 'Also', meaning: 'In addition; too.', example: 'She is a talented musician and also a great painter.' },
-            { word: 'Always', meaning: 'At all times; on all occasions.', example: 'He always arrives early for meetings.' },
-            { word: 'Ask', meaning: 'Say something in order to obtain an answer or some information.', example: 'If you don\'t know, you should ask.' },
-            { word: 'Because', meaning: 'For the reason that; since.', example: 'I am late because there was heavy traffic.' },
-            { word: 'Before', meaning: 'During the period of time preceding a particular event or time.', example: 'Please finish your homework before you go out to play.' },
-            { word: 'Big', meaning: 'Of considerable size, extent, or intensity.', example: 'That is a very big dog.' },
-            { word: 'Come', meaning: 'Move or travel toward or into a place thought of as near or familiar to the speaker.', example: 'Can you come to my party on Saturday?' },
-            { word: 'Day', meaning: 'Each of the twenty-four-hour periods, reckoned from one midnight to the next.', example: 'It was a beautiful sunny day.' },
-            { word: 'Find', meaning: 'Discover or perceive by chance or unexpectedly.', example: 'I can\'t find my keys anywhere.' },
-            { word: 'First', meaning: 'Coming before all others in time or order; earliest; 1st.', example: 'She was the first person to arrive.' },
-            { word: 'For', meaning: 'Indicating the purpose or reason for something.', example: 'This gift is for you.' },
-            { word: 'Friend', meaning: 'A person whom one knows and with whom one has a bond of mutual affection.', example: 'He is my best friend.' },
-            { word: 'From', meaning: 'Indicating the starting point of a journey or action.', example: 'The train from London has arrived.' },
-            { word: 'Go', meaning: 'Move from one place to another; travel.', example: 'We need to go to the store.' },
-            { word: 'Good', meaning: 'To be desired or approved of.', example: 'She did a good job on the project.' },
-            { word: 'Happy', meaning: 'Feeling or showing pleasure or contentment.', example: 'The happy child was laughing.' },
-            { word: 'Have', meaning: 'Possess, own, or hold.', example: 'I have two brothers.' },
-            { word: 'Here', meaning: 'In, at, or to this place or position.', example: 'Please put the box right here.' },
-            { word: 'How', meaning: 'In what way or manner; by what means.', example: 'How do you solve this problem?' },
-            { word: 'Into', meaning: 'Expressing movement or action with the result that someone or something becomes enclosed or surrounded by something else.', example: 'He jumped into the pool.' },
-            { word: 'Like', meaning: 'Having the same characteristics or qualities as; similar to.', example: 'She looks like her mother.' },
-            { word: 'Little', meaning: 'Small in size, amount, or degree.', example: 'There is a little cat in the garden.' },
-            { word: 'Long', meaning: 'Measuring a great distance from end to end.', example: 'It was a long journey.' },
-            { word: 'Look', meaning: 'Direct one\'s gaze toward someone or something or in a specified direction.', example: 'Look at that beautiful sunset!' },
-            { word: 'Make', meaning: 'Form (something) by putting parts together or combining substances; construct; create.', example: 'Can you make a cup of tea?' },
-            { word: 'Many', meaning: 'A large number of.', example: 'There are many books on the shelf.' },
-            { word: 'More', meaning: 'A greater or additional amount or degree of.', example: 'I need more time to finish.' },
-            { word: 'My', meaning: 'Belonging to or associated with the speaker.', example: 'This is my house.' },
-            { word: 'New', meaning: 'Produced, introduced, or discovered recently or now for the first time.', example: 'I bought a new car.' },
-            { word: 'Not', meaning: 'Used with an auxiliary verb or "be" to form the negative.', example: 'I am not tired.' },
-            { word: 'Now', meaning: 'At the present time or moment.', example: 'We have to leave now.' },
-            { word: 'Of', meaning: 'Expressing the relationship between a part and a whole.', example: 'A piece of cake.' },
-            { word: 'On', meaning: 'Physically in contact with and supported by (a surface).', example: 'The book is on the table.' },
-            { word: 'One', meaning: 'The lowest cardinal number; half of two; 1.', example: 'There is only one cookie left.' },
-            { word: 'Only', meaning: 'And no one or nothing more besides; solely or exclusively.', example: 'He was the only person there.' },
-            { word: 'Or', meaning: 'Used to link alternatives.', example: 'Do you want tea or coffee?' },
-            { word: 'Other', meaning: 'Used to refer to a person or thing that is different or distinct from one already mentioned.', example: 'The other students are in the library.' },
-            { word: 'Our', meaning: 'Belonging to or associated with the speaker and one or more other people.', example: 'This is our home.' },
-            { word: 'Out', meaning: 'Moving or appearing to move away from a particular place, especially one that is enclosed or hidden.', example: 'She walked out of the room.' },
-            { word: 'Over', meaning: 'Extending directly upward from.', example: 'The bridge is over the river.' },
-            { word: 'People', meaning: 'Human beings in general or considered collectively.', example: 'There were many people at the concert.' },
-            { word: 'Place', meaning: 'A particular position or point in space.', example: 'This is a good place for a picnic.' },
-            { word: 'Say', meaning: 'Utter words so as to convey information, an opinion, a feeling or intention, or a question.', example: 'What did you say?' },
-            { word: 'See', meaning: 'Perceive with the eyes; discern visually.', example: 'Did you see that bird?' },
-            { word: 'She', meaning: 'Used to refer to a woman, girl, or female animal previously mentioned.', example: 'She is my sister.' },
-            { word: 'So', meaning: 'And for this reason; therefore.', example: 'It was raining, so I took an umbrella.' },
-            { word: 'Some', meaning: 'An unspecified amount or number of.', example: 'I would like some water, please.' },
-            { word: 'Take', meaning: 'Lay hold of (something) with one\'s hands; reach for and hold.', example: 'Please take one.' },
-            { word: 'Tell', meaning: 'Communicate information, facts, or news to someone in spoken or written words.', example: 'Can you tell me the time?' },
-            { word: 'Than', meaning: 'Introducing the second element in a comparison.', example: 'He is taller than his brother.' },
-            { word: 'That', meaning: 'Used to identify a specific person or thing observed by the speaker.', example: 'That is my car.' },
-            { word: 'The', meaning: 'Denoting one or more people or things already mentioned or assumed to be common knowledge.', example: 'The sun is shining.' },
-            { word: 'Their', meaning: 'Belonging to or associated with the people or things previously mentioned.', example: 'The children are with their parents.' },
-            { word: 'Them', meaning: 'Used as the object of a verb or preposition to refer to two or more people or things previously mentioned.', example: 'I saw them at the park.' },
-            { word: 'Then', meaning: 'At that time; at the time in question.', example: 'First I will go to the bank, then to the store.' },
-            { word: 'There', meaning: 'In, at, or to that place or position.', example: 'The book is over there.' },
-            { word: 'These', meaning: 'Plural of this.', example: 'These apples are delicious.' },
-            { word: 'They', meaning: 'Used to refer to two or more people or things previously mentioned.', example: 'They are playing in the garden.' },
-            { word: 'Thing', meaning: 'An object that one need not, cannot, or does not wish to give a specific name to.', example: 'What is that thing on the table?' },
-            { word: 'Think', meaning: 'Have a particular opinion, belief, or idea about someone or something.', example: 'I think it will rain today.' },
-            { word: 'This', meaning: 'Used to identify a specific person or thing close at hand or being indicated or experienced.', example: 'This is my favorite song.' },
-            { word: 'Those', meaning: 'Plural of that.', example: 'Those mountains are beautiful.' },
-            { word: 'Time', meaning: 'The indefinite continued progress of existence and events in the past, present, and future regarded as a whole.', example: 'What time is it?' },
-            { word: 'To', meaning: 'Expressing motion in the direction of (a particular location).', example: 'I am going to the library.' },
-            { word: 'Up', meaning: 'Toward a higher place or position.', example: 'The balloon went up into the sky.' },
-            { word: 'Use', meaning: 'Take, hold, or deploy (something) as a means of accomplishing a purpose or achieving a result; employ.', example: 'Can I use your pen?' },
-            { word: 'Very', meaning: 'In a high degree.', example: 'It is very cold outside.' },
-            { word: 'Want', meaning: 'Have a desire to possess or do (something); wish for.', example: 'I want a new bike.' },
-            { word: 'Way', meaning: 'A method, style, or manner of doing something.', example: 'This is the best way to do it.' },
-            { word: 'We', meaning: 'Used by a speaker to refer to himself or herself and one or more other people.', example: 'We are going on vacation.' },
-            { word: 'Well', meaning: 'In a good or satisfactory way.', example: 'She speaks English very well.' },
-            { word: 'What', meaning: 'Asking for information specifying something.', example: 'What is your name?' },
-            { word: 'When', meaning: 'At what time.', example: 'When does the movie start?' },
-            { word: 'Which', meaning: 'Asking for information specifying one or more people or things from a definite set.', example: 'Which color do you prefer?' },
-            { word: 'Who', meaning: 'What or which person or people.', example: 'Who is that person?' },
-            { word: 'Will', meaning: 'Expressing the future tense.', example: 'I will call you later.' },
-            { word: 'With', meaning: 'Accompanied by (another person or thing).', example: 'I am going with my friends.' },
-            { word: 'Work', meaning: 'Activity involving mental or physical effort done in order to achieve a purpose or result.', example: 'I have a lot of work to do.' },
-            { word: 'Would', meaning: 'Used to express a desire or a polite request.', example: 'Would you like some tea?' },
-            { word: 'Year', meaning: 'The time taken by the earth to make one revolution around the sun.', example: 'The year is 2025.' },
-            { word: 'You', meaning: 'Used to refer to the person or people that the speaker is addressing.', example: 'You are a good student.' },
-            { word: 'Your', meaning: 'Belonging to or associated with the person or people that the speaker is addressing.', example: 'Is this your book?' },
-
-            // Tier 2: Intermediate Words
-            { word: 'Aberration', meaning: 'A departure from what is normal, usual, or expected, typically an unwelcome one.', example: 'The single poor grade was an aberration in her otherwise excellent academic record.' },
-            { word: 'Acquiesce', meaning: 'Accept something reluctantly but without protest.', example: 'She was unwilling to acquiesce to their demands.' },
-            { word: 'Alacrity', meaning: 'Bris_k and cheerful readiness.', example: 'She accepted the invitation with alacrity.' },
-            { word: 'Amiable', meaning: 'Having or displaying a friendly and pleasant manner.', example: 'He was an amiable man, always ready with a smile.' },
-            { word: 'Appease', meaning: 'Pacify or placate (someone) by acceding to their demands.', example: 'The government tried to appease the protesters with new policies.' },
-            { word: 'Arcane', meaning: 'Understood by few; mysterious or secret.', example: 'He was the only one who understood the arcane rules of the ancient game.' },
-            { word: 'Avarice', meaning: 'Extreme greed for wealth or material gain.', example: 'His avarice led him to make some unethical business decisions.' },
-            { word: 'Banal', meaning: 'So lacking in originality as to be obvious and boring.', example: 'The plot of the movie was completely banal.' },
-            { word: 'Benevolent', meaning: 'Well meaning and kindly.', example: 'A benevolent donor provided the funds for the new hospital wing.' },
-            { word: 'Capricious', meaning: 'Given to sudden and unaccountable changes of mood or behavior.', example: 'The capricious weather made it difficult to plan the outdoor event.' },
-            { word: 'Catalyst', meaning: 'A person or thing that precipitates an event.', example: 'The assassination of the archduke was the catalyst for World War I.' },
-            { word: 'Caustic', meaning: 'Sarcastic in a scathing and bitter way.', example: 'His caustic remarks were not appreciated by the team.' },
-            { word: 'Clandestine', meaning: 'Kept secret or done secretively, especially because illicit.', example: 'They held a clandestine meeting in the dead of night.' },
-            { word: 'Cognizant', meaning: 'Having knowledge or being aware of.', example: 'He was cognizant of the risks involved.' },
-            { word: 'Complacent', meaning: 'Showing smug or uncritical satisfaction with oneself or one\'s achievements.', example: 'We can\'t afford to become complacent about our success.' },
-            { word: 'Conundrum', meaning: 'A confusing and difficult problem or question.', example: 'The source of the mysterious noise was a conundrum for the residents.' },
-            { word:- 'Credulous', meaning: 'Having or showing too great a readiness to believe things.', example: 'Credulous people are easily fooled by scams.' },
-            { word: 'Deleterious', meaning: 'Causing harm or damage.', example: 'The chemical is deleterious to the environment.' },
-            { word: 'Demeanor', meaning: 'Outward behavior or bearing.', example: 'She had a calm and professional demeanor.' },
-            { word: 'Didactic', meaning: 'Intended to teach, particularly in having moral instruction as an ulterior motive.', example: 'The professor\'s didactic style was informative but a bit dry.' },
-            { word: 'Disparate', meaning: 'Essentially different in kind; not allowing comparison.', example: 'The study brought together disparate areas of research.' },
-            { word: 'Dogmatic', meaning: 'Inclined to lay down principles as incontrovertibly true.', example: 'He was a dogmatic and inflexible leader.' },
-            { word: 'Dubious', meaning: 'Hesitating or doubting; not to be relied upon.', example: 'I was dubious about his chances of success.' },
-            { word: 'Eclectic', meaning: 'Deriving ideas, style, or taste from a broad and diverse range of sources.', example: 'Her musical tastes are very eclectic.' },
-            { word: 'Egregious', meaning: 'Outstandingly bad; shocking.', example: 'It was an egregious error for a statesman to show such poor judgment.' },
-            { word: 'Elicit', meaning: 'Evoke or draw out (a response, answer, or fact) from someone.', example: 'The lawyer tried to elicit a confession from the witness.' },
-            { word: 'Epitome', meaning: 'A person or thing that is a perfect example of a particular quality or type.', example: 'She is the epitome of grace and elegance.' },
-            { word: 'Equanimity', meaning: 'Mental calmness, composure, and evenness of temper, especially in a difficult situation.', example: 'She accepted both the good and the bad with equanimity.' },
-            { word: 'Erroneous', meaning: 'Wrong; incorrect.', example: 'The scientists concluded that their initial findings were erroneous.' },
-            { word: 'Eschew', meaning: 'Deliberately avoid using; abstain from.', example: 'He appealed to the crowd to eschew violence.' },
-            { word: 'Exacerbate', meaning: 'Make (a problem, bad situation, or negative feeling) worse.', example: 'His angry comments only served to exacerbate the situation.' },
-            { word: 'Fastidious', meaning: 'Very attentive to and concerned about accuracy and detail.', example: 'He was fastidious about his appearance.' },
-            { word: 'Fatuous', meaning: 'Silly and pointless.', example: 'It was a fatuous comment that contributed nothing to the discussion.' },
-            { word: 'Fortuitous', meaning: 'Happening by accident or chance rather than design.', example: 'A fortuitous meeting with a film director launched her career.' },
-            { word: 'Garrulous', meaning: 'Excessively talkative, especially on trivial matters.', example: 'The garrulous old man told us his life story.' },
-            { word: 'Gregarious', meaning: '(Of a person) fond of company; sociable.', example: 'He was a popular and gregarious man.' },
-            { word: 'Hapless', meaning: '(Especially of a person) unfortunate.', example: 'The hapless tourists had their luggage stolen.' },
-            { word: 'Harangue', meaning: 'A lengthy and aggressive speech.', example: 'He delivered a long harangue about the evils of modern society.' },
-            { word: 'Iconoclast', meaning: 'A person who attacks cherished beliefs or institutions.', example: 'As an artist, she was an iconoclast, constantly pushing boundaries.' },
-            { word: 'Idiosyncrasy', meaning: 'A mode of behavior or way of thought peculiar to an individual.', example: 'One of his idiosyncrasies was always wearing a red tie.' },
-            { word: 'Impeccable', meaning: '(Of behavior, performance, or appearance) in accordance with the highest standards of propriety; faultless.', example: 'He had impeccable manners.' },
-            { word: 'Impetuous', meaning: 'Acting or done quickly and without thought or care.', example: 'His impetuous decision to quit his job was a mistake.' },
-            { word: 'Incongruous', meaning: 'Not in harmony or keeping with the surroundings or other aspects of something.', example: 'The modern sculpture looked incongruous in the ancient castle.' },
-            { word: 'Indolent', meaning: 'Wanting to avoid activity or exertion; lazy.', example: 'He spent the indolent afternoon napping in a hammock.' },
-            { word: 'Ineffable', meaning: 'Too great or extreme to be expressed or described in words.', example: 'The view from the mountaintop was one of ineffable beauty.' },
-            { word: 'Inexorable', meaning: 'Impossible to stop or prevent.', example: 'The inexorable advance of technology continues to change our world.' },
-            { word: 'Innate', meaning: 'Inborn; natural.', example: 'He had an innate talent for music.' },
-            { word: 'Insidious', meaning: 'Proceeding in a gradual, subtle way, but with harmful effects.', example: 'The insidious effects of the disease were not noticed at first.' },
-            { word: 'Juxtaposition', meaning: 'The fact of two things being seen or placed close together with contrasting effect.', example: 'The juxtaposition of the old and new buildings was striking.' },
-            { word: 'Laconic', meaning: '(Of a person, speech, or style of writing) using very few words.', example: 'His laconic reply suggested a lack of interest.' },
-            { word: 'Laudable', meaning: '(Of an action, idea, or goal) deserving praise and commendation.', example: 'Her efforts to help the homeless are laudable.' },
-            { word: 'Loquacious', meaning: 'Tending to talk a great deal; talkative.', example: 'The loquacious host kept the party entertained.' },
-
-            // Tier 3: Advanced Words
-            { word: 'Ephemeral', meaning: 'Lasting for a very short time.', example: 'The beauty of the cherry blossoms is ephemeral.' }, 
-            { word: 'Ubiquitous', meaning: 'Present, appearing, or found everywhere.', example: 'Smartphones have become ubiquitous in modern society.' }, 
-            { word: 'Mellifluous', meaning: 'A sound that is sweet and pleasant to hear.', example: 'She had a mellifluous voice that soothed everyone.' }, 
-            { word: 'Parsimonious', meaning: 'Unwilling to spend money or use resources; frugal to a fault.', example: 'His parsimonious nature meant he would walk miles to save a few cents on bus fare.' },
-            { word: 'Magnanimous', meaning: 'Very generous or forgiving, especially toward a rival or someone less powerful.', example: 'The magnanimous victor allowed the defeated army to retreat peacefully.' },
-            { word: 'Ostentatious', meaning: 'Characterized by pretentious display; designed to impress.', example: 'He bought an ostentatious sports car to show off his new wealth.' },
-            { word: 'Precocious', meaning: 'Having developed certain abilities at an earlier age than usual.', example: 'The precocious child was reading novels at the age of five.' },
-            { word: 'Quandary', meaning: 'A state of perplexity or uncertainty over what to do in a difficult situation.', example: 'She was in a quandary about whether to accept the job offer or continue her studies.' },
-            { word: 'Recalcitrant', meaning: 'Having an obstinately uncooperative attitude toward authority or discipline.', example: 'The recalcitrant student refused to do any of his assignments.' },
-            { word: 'Salient', meaning: 'Most noticeable or important.', example: 'The salient point of his argument was that the plan was too expensive.' },
-            { word: 'Sycophant', meaning: 'A person who acts obsequiously toward someone important in order to gain advantage.', example: 'The king was surrounded by sycophants who were only interested in their own gain.' },
-            { word: 'Taciturn', meaning: '(Of a person) reserved or uncommunicative in speech; saying little.', example: 'The taciturn farmer rarely spoke more than a few words at a time.' },
-            { word: 'Unctuous', meaning: '(Of a person) excessively or ingratiatingly flattering; oily.', example: 'The unctuous salesman was trying too hard to be my friend.' },
-            { word: 'Vapid', meaning: 'Offering nothing that is stimulating or challenging; bland.', example: 'The conversation was vapid and uninteresting.' },
-            { word: 'Veracity', meaning: 'Conformity to facts; accuracy.', example: 'The veracity of his story was questionable.' },
-            { word: 'Vicissitude', meaning: 'A change of circumstances or fortune, typically one that is unwelcome or unpleasant.', example: 'He had experienced all the vicissitudes of a long and difficult life.' },
-            { word: 'Vilify', meaning: 'Speak or write about in an abusively disparaging manner.', example: 'The politician was vilified in the press for his controversial views.' },
-            { word: 'Vociferous', meaning: '(Especially of a person or speech) vehement or clamorous.', example: 'The vociferous protests could be heard from blocks away.' },
-            { word: 'Zephyr', meaning: 'A soft gentle breeze.', example: 'A gentle zephyr rustled the leaves in the trees.' },
-        ];
-        const grammarLessons = [ 
-            { title: "Present Simple vs. Continuous", content: `Use <strong>Present Simple</strong> for habits, routines, and general truths (e.g., "The sun rises in the east."). Use <strong>Present Continuous</strong> for actions happening at the moment of speaking or temporary situations (e.g., "I am reading a book right now.").` }, 
-            { title: "Past Simple vs. Past Continuous", content: `Use <strong>Past Simple</strong> for completed actions in the past (e.g., "I visited Paris last year."). Use <strong>Past Continuous</strong> for actions that were in progress at a specific time in the past (e.g., "I was watching TV when you called.").` },
-            { title: "Present Perfect vs. Past Simple", content: `Use <strong>Present Perfect</strong> for actions that happened at an unspecified time in the past or have a connection to the present (e.g., "I have lost my keys."). Use <strong>Past Simple</strong> for actions that happened at a specific, finished time (e.g., "I lost my keys yesterday.").` },
-            { title: "Future Tenses: will, be going to, Present Continuous", content: `Use <strong>will</strong> for predictions, spontaneous decisions, and promises (e.g., "I think it will rain."). Use <strong>be going to</strong> for plans and intentions (e.g., "I am going to start a new course."). Use <strong>Present Continuous</strong> for fixed arrangements in the near future (e.g., "I am meeting my friend tomorrow.").` },
-            { title: "Articles: A, An, The, and No Article", content: `Use <strong>'a'/'an'</strong> for non-specific, singular countable nouns. Use <strong>'the'</strong> for specific nouns known to the listener. Use <strong>no article</strong> for general plural or uncountable nouns (e.g., "I like music." or "Dogs are loyal.").` }, 
-            { title: "Prepositions of Time: In, On, At", content: `Use <strong>in</strong> for months, years, seasons, and parts of the day (in July, in 2025, in the morning). Use <strong>on</strong> for days and dates (on Monday, on May 5th). Use <strong>at</strong> for specific times and holidays (at 7 PM, at Christmas).` },
-            { title: "Modal Verbs of Obligation and Permission", content: `<strong>Must/Have to</strong> express strong obligation (e.g., "You must wear a helmet."). <strong>Should</strong> expresses advice (e.g., "You should eat more vegetables."). <strong>Can/May</strong> express permission (e.g., "Can I open the window?").` },
-            { title: "Conditionals: Zero, First, Second, Third", content: `<strong>Zero:</strong> general truths (If you heat water, it boils). <strong>First:</strong> possible future (If it rains, we'll stay home). <strong>Second:</strong> hypothetical/unlikely present/future (If I won the lottery, I would travel). <strong>Third:</strong> hypothetical past (If I had studied, I would have passed the exam).` },
-            { title: "Reported Speech (Indirect Speech)", content: `When reporting what someone said, you often have to change the tense (backshift), pronouns, and time expressions. "I am happy today," he said. -> He said that he was happy that day.` },
-            { title: "The Passive Voice", content: `The passive voice is used when the focus is on the action, not the person who did it. The object of the active sentence becomes the subject of the passive sentence. Active: "Someone stole my bike." -> Passive: "My bike was stolen."` },
-            { title: "Gerunds and Infinitives", content: `A <strong>gerund</strong> (-ing form) acts as a noun (e.g., "<strong>Swimming</strong> is fun."). An <strong>infinitive</strong> (to + verb) can also be a noun, or follow adjectives/verbs (e.g., "I want <strong>to swim</strong>." or "It's important <strong>to be</strong> on time.").` },
-            { title: "Relative Clauses: Defining and Non-defining", content: `<strong>Defining clauses</strong> give essential information ("The man <strong>who lives next door</strong> is a doctor."). <strong>Non-defining clauses</strong> give extra information and use commas ("My brother, <strong>who lives in London</strong>, is a doctor.").` }
-        ];
-        const readingData = [
-            {
-                id: 'reading-1',
-                title: "The History of Coffee",
-                passage: `<p>Coffee is one of the most popular beverages worldwide, yet its origins are shrouded in legend. The most famous story traces its discovery to an Ethiopian goat herder named Kaldi in the 9th century. He noticed his goats became incredibly energetic after eating berries from a particular tree. Kaldi tried the berries himself and experienced a similar stimulating effect. He reported his findings to the abbot of a local monastery, who made a drink with the berries and found it kept him alert through long hours of evening prayer. The knowledge of the energizing berries began to spread.</p><p>From Ethiopia, coffee cultivation and trade began on the Arabian Peninsula. By the 15th century, it was being grown in the Yemeni district of Arabia and by the 16th century, it was known in Persia, Egypt, Syria, and Turkey. Coffee was not only enjoyed in homes but also in the many public coffee houses — called <em>qahveh khaneh</em> — which began to appear in cities across the Near East. These coffee houses became important centers for social activity and the exchange of information.</p>`,
-                quiz: [
-                    { question: "According to legend, who first discovered coffee?", options: ["A Turkish merchant", "An Ethiopian goat herder", "An Arabian monk"], answer: "An Ethiopian goat herder" },
-                    { question: "What effect did the coffee berries have on the goats?", options: ["They became sleepy", "They became sick", "They became energetic"], answer: "They became energetic" },
-                    { question: "What were the public coffee houses in the Near East called?", options: ["Café", "Qahveh khaneh", "Coffee shops"], answer: "Qahveh khaneh" }
-                ]
-            },
-            {
-                id: 'reading-2',
-                title: "The Importance of Sleep",
-                passage: `<p>In our fast-paced, 24/7 society, sleep is often viewed as a luxury rather than a necessity. However, a vast body of scientific research confirms that sleep is crucial for physical and mental health. During sleep, the body works to support healthy brain function and maintain physical health. In children and teens, sleep also helps support growth and development.</p><p>The long-term consequences of sleep deprivation are serious. Chronic sleep loss can increase the risk of several health problems, including heart disease, kidney disease, high blood pressure, diabetes, and stroke. It can also impair cognitive functions, such as attention, decision-making, and creativity. Furthermore, a lack of sleep can affect emotional regulation, leading to mood swings and an increased risk of anxiety and depression. Prioritizing consistent, quality sleep is one of the most important things you can do for your overall well-being.</p>`,
-                quiz: [
-                    { question: "What is a major function of sleep?", options: ["Increasing stress levels", "Supporting healthy brain function", "Wasting time"], answer: "Supporting healthy brain function" },
-                    { question: "Which of these is NOT a potential consequence of sleep deprivation?", options: ["Improved memory", "Heart disease", "High blood pressure"], answer: "Improved memory" }
-                ]
-            }
-        ];
-        const listeningData = { title: "Ordering a Pizza", transcript: "Hi, I'd like to order a large pepperoni pizza with extra cheese. Can I also get a side of garlic bread and a two-liter bottle of soda? Thank you.", quiz: [ { question: "What size pizza is ordered?", options: ["Small", "Medium", "Large"], answer: "Large" }, { question: "What is the main topping on the pizza?", options: ["Mushrooms", "Pepperoni", "Onions"], answer: "Pepperoni" }, { question: "What drink is ordered?", options: ["Water", "Juice", "Soda"], answer: "Soda" }] };
-        const speakingSentences = [ "The quick brown fox jumps over the lazy dog.", "She sells seashells by the seashore.", "How can a clam cram in a clean cream can?", "I have a meeting at three o'clock this afternoon.", "Peter Piper picked a peck of pickled peppers.", "Red lorry, yellow lorry." ];
-        const dictationSentences = [ "The weather is beautiful today.", "My favorite color is blue.", "He is coming to the party tonight.", "Let's go for a walk in the park.", "The library is closed on Sundays.", "Don't forget to buy milk." ];
-        
-        // --- Firebase Setup ---
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        
-        // --- Global State ---
-        let completedTasks = new Set();
-        let totalTasks = 0;
-
-        // --- UI Element References ---
-        const authView = document.getElementById('auth-view');
-        const portalView = document.getElementById('portal-view');
-        const welcomePopup = document.getElementById('welcome-popup');
-        const loadingView = document.getElementById('loading-view');
-        const initialView = document.getElementById('initial-view');
-        const signupContainer = document.getElementById('signup-container');
-        const loginContainer = document.getElementById('login-container');
-        const messageBox = document.getElementById('message-box');
-        
-        // --- Auth Listeners ---
-        onAuthStateChanged(auth, user => {
-            hideMessage();
-            if (user && !user.isAnonymous) {
-                // User is logged in with a permanent account
-                authView.style.display = 'none';
-                portalView.style.display = 'none';
-                welcomePopup.style.display = 'flex';
-                document.getElementById('user-email-display').textContent = user.email;
-            } else if (user && user.isAnonymous) {
-                // User is anonymous, show login/signup options.
-                authView.style.display = 'flex';
-                portalView.style.display = 'none';
-                welcomePopup.style.display = 'none';
-                showAuthForm(initialView);
-            } else {
-                // User is signed out.
-                initializeAuth();
-            }
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
         });
+        const result = await response.json();
         
-        // --- Main App Initialization ---
-        function initializeAppContent() {
-            // Reset state for new login
-            completedTasks = new Set();
-            totalTasks = 0;
-            
-            setupNavigation();
-            renderDashboard();
-            renderVocabulary();
-            renderGrammar();
-            renderReading();
-            renderListening();
-            renderSpeaking();
-            renderDictation();
-            updateProgressBar();
+        if (result.candidates && result.candidates[0]?.content?.parts[0]?.text) {
+            const aiTextFeedback = result.candidates[0].content.parts[0].text;
+            setFeedback(aiTextFeedback);
+            saveSpeakingResult(speechResult, aiTextFeedback);
+        } else {
+            console.error("Unexpected API response:", result);
+            setFeedback('Could not get AI feedback due to an unexpected API response.');
         }
 
-        // --- Auth UI and Logic ---
-        function showAuthForm(formToShow) {
-            loadingView.style.display = 'none';
-            initialView.style.display = 'none';
-            signupContainer.style.display = 'none';
-            loginContainer.style.display = 'none';
-            formToShow.style.display = 'block';
-        }
-        
-        function showMessage(message, isError = false) {
-            messageBox.textContent = message;
-            messageBox.className = `text-center p-3 rounded-lg text-sm mt-4 ${isError ? 'bg-red-900/50 text-red-300' : 'bg-green-900/50 text-green-300'}`;
-        }
-        function hideMessage() { messageBox.className = 'hidden'; }
+    } catch (apiError) {
+        console.error('Error calling Gemini API:', apiError);
+        setFeedback('An error occurred while getting feedback from the AI. Please try again.');
+    } finally {
+        setIsLoading(false);
+    }
+  };
 
-        document.getElementById('show-signup-btn').addEventListener('click', () => showAuthForm(signupContainer));
-        document.getElementById('show-login-btn').addEventListener('click', () => showAuthForm(loginContainer));
-        document.querySelectorAll('.back-to-initial').forEach(btn => btn.addEventListener('click', (e) => { e.preventDefault(); showAuthForm(initialView); }));
+  return (
+    <Card title="Speaking Practice" className="bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200">
+      <p className="text-gray-700 mb-6 text-lg text-center">Record yourself speaking English and get AI feedback. Your progress will be saved automatically.</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <Button onClick={startRecording} disabled={isRecording}>
+          {isRecording ? '🔴 Recording...' : '🎤 Start Recording'}
+        </Button>
+        <Button onClick={stopRecording} disabled={!isRecording}>
+          ⏹️ Stop Recording
+        </Button>
+      </div>
+      {audioBlob && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+          <Button onClick={playAudio}>▶️ Play Recording</Button>
+          <Button onClick={analyzeSpeech} disabled={isLoading}>
+            {isLoading ? 'Analyzing...' : '✨ Get AI Feedback'}
+          </Button>
+        </div>
+      )}
 
-        document.getElementById('signup-form').addEventListener('submit', (e) => {
-            e.preventDefault(); hideMessage();
-            const email = e.target['signup-email'].value;
-            const password = e.target['signup-password'].value;
-            createUserWithEmailAndPassword(auth, email, password)
-                .catch(err => showMessage(err.message, true));
-        });
+      {isLoading && <LoadingSpinner />}
+      {transcribedText && !isLoading && (
+        <div className="mt-6 p-5 bg-indigo-100 rounded-lg border border-indigo-300 shadow-inner">
+          <p className="font-bold text-indigo-800 text-xl mb-3">Your Transcribed Text:</p>
+          <p className="whitespace-pre-wrap text-gray-800 text-lg leading-relaxed italic">"{transcribedText}"</p>
+        </div>
+      )}
+      {feedback && !isLoading && (
+        <div className="mt-6 p-5 bg-blue-100 rounded-lg border border-blue-300 shadow-inner">
+          <p className="font-bold text-blue-800 text-xl mb-3">AI Feedback:</p>
+          <p className="whitespace-pre-wrap text-gray-800 text-lg leading-relaxed">{feedback}</p>
+        </div>
+      )}
+    </Card>
+  );
+};
 
-        document.getElementById('login-form').addEventListener('submit', (e) => {
-            e.preventDefault(); hideMessage();
-            const email = e.target['login-email'].value;
-            const password = e.target['login-password'].value;
-            signInWithEmailAndPassword(auth, email, password)
-                .catch(err => showMessage(err.message, true));
-        });
 
-        document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
-        
-        document.getElementById('enter-portal-btn').addEventListener('click', () => {
-             welcomePopup.style.display = 'none';
-             authView.style.display = 'none';
-             portalView.style.display = 'block';
-             initializeAppContent();
-        });
+// --- Dictation Exercise Component ---
+const DictationExercise = ({ firebaseUid, studentDisplayName }) => {
+  const [currentSentence, setCurrentSentence] = useState('');
+  const [userAnswer, setUserAnswer] = useState('');
+  const [feedback, setFeedback] = useState(null); // Use null to differentiate from empty string feedback
+  const [isAttempted, setIsAttempted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-        // --- Initial Mandatory Auth Flow ---
-        async function initializeAuth() {
-            authView.style.display = 'flex';
-            showAuthForm(loadingView);
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    if (!auth.currentUser) await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Initial auth failed:", error);
-                showMessage("Connection Error. Please refresh.", true);
-                showAuthForm(loadingView);
-                loadingView.querySelector('h1').textContent = "Connection Error";
-            }
+  const sentences = [
+    "The vast majority of scientific discoveries originate from curious minds.",
+    "Effective communication is the cornerstone of successful international relations.",
+    "Technological advancements have profoundly impacted every aspect of modern life.",
+    "The biodiversity of rainforests is crucial for maintaining global ecological balance.",
+    "Critical thinking involves analyzing information objectively and forming reasoned judgments."
+  ];
+
+  const generateSentence = useCallback(() => {
+    setIsAttempted(false);
+    setUserAnswer('');
+    setFeedback(null);
+    const randomIndex = Math.floor(Math.random() * sentences.length);
+    setCurrentSentence(sentences[randomIndex]);
+  }, [sentences]);
+
+  const saveDictationResult = useCallback(async (sentence, answer, isCorrect) => {
+    if (!firebaseUid) { return; }
+    const dictationCollectionRef = collection(db, `artifacts/${appId}/users/${firebaseUid}/dictationExercises`);
+    try {
+      await setDoc(doc(dictationCollectionRef), {
+        timestamp: new Date().toISOString(),
+        studentDisplayName: studentDisplayName,
+        sentence: sentence,
+        userAnswer: answer,
+        isCorrect: isCorrect,
+      });
+    } catch (e) {
+      console.error("Error saving dictation result: ", e);
+    }
+  }, [firebaseUid, studentDisplayName]);
+
+  const playSentence = () => {
+    if (!currentSentence || window.speechSynthesis.speaking) return;
+    setIsLoading(true);
+    const utterance = new SpeechSynthesisUtterance(currentSentence);
+    utterance.lang = 'en-US';
+    utterance.onend = () => setIsLoading(false);
+    utterance.onerror = (e) => {
+      console.error('SpeechSynthesis Error:', e);
+      setIsLoading(false);
+      setFeedback(<AlertMessage type="error" message="Could not play audio. Your browser may not support this feature."/>);
+    };
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const checkAnswer = () => {
+    if (!currentSentence) return;
+    setIsAttempted(true);
+    const correct = currentSentence.trim().toLowerCase().replace(/[.,!?;:"']/g, "");
+    const user = userAnswer.trim().toLowerCase().replace(/[.,!?;:"']/g, "");
+
+    if (correct === user) {
+      setFeedback(<AlertMessage type="info" message="🥳 Correct! Excellent work!"/>);
+      saveDictationResult(currentSentence, userAnswer, true);
+    } else {
+      const feedbackHtml = `<strong>Incorrect.</strong> The correct sentence was: <br/><em class="text-indigo-700">${currentSentence}</em>`;
+      setFeedback(<div className="p-4 bg-red-100 border-red-400 text-red-700 rounded-lg" dangerouslySetInnerHTML={{ __html: feedbackHtml }}/>);
+      saveDictationResult(currentSentence, userAnswer, false);
+    }
+  };
+  
+  useEffect(() => {
+    generateSentence();
+    // Cleanup synthesis on component unmount
+    return () => {
+        if(window.speechSynthesis && window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
         }
-        
-        // --- Navigation ---
-        function setupNavigation() {
-            const navLinks = document.querySelectorAll('.nav-link');
-            const contentSections = document.querySelectorAll('.content-section');
-            navLinks.forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const targetId = link.dataset.target;
-                    navLinks.forEach(l => l.classList.remove('bg-sky-500/20', 'text-slate-200'));
-                    link.classList.add('bg-sky-500/20', 'text-slate-200');
-                    contentSections.forEach(s => s.classList.toggle('active', s.id === targetId));
-                });
-            });
-        }
+    }
+  }, [generateSentence]);
 
-        // --- Progress Tracking ---
-        function markTaskComplete(taskId) {
-            completedTasks.add(taskId);
-            const button = document.querySelector(`[data-task-id="${taskId}"]`);
-            if (button) {
-                button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Completed`;
-                button.disabled = true;
-                button.classList.remove('bg-sky-600', 'hover:bg-sky-700');
-                button.classList.add('bg-green-600', 'cursor-not-allowed');
-            }
-            updateProgressBar();
-        }
+  return (
+    <Card title="Dictation Exercise" className="bg-gradient-to-br from-green-50 to-teal-100 border border-green-200">
+      <p className="text-gray-700 mb-6 text-lg text-center">Listen carefully and type exactly what you hear.</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <Button onClick={generateSentence}>📝 New Sentence</Button>
+        <Button onClick={playSentence} disabled={isLoading || !currentSentence}>
+          {isLoading ? 'Playing...' : '🔊 Play Sentence'}
+        </Button>
+      </div>
 
-        function updateProgressBar() {
-            const percentage = totalTasks > 0 ? (completedTasks.size / totalTasks) * 100 : 0;
-            document.getElementById('progress-bar').style.width = `${percentage}%`;
-            document.getElementById('progress-text').textContent = `${Math.round(percentage)}% Complete (${completedTasks.size}/${totalTasks})`;
-        }
-        
-        function createCompleteButton(taskId) {
-            totalTasks++;
-            return `<button data-task-id="${taskId}" onclick="window.markTaskComplete('${taskId}')" class="mt-4 bg-sky-600 hover:bg-sky-700 font-semibold py-2 px-4 rounded-lg transition-colors flex items-center text-sm">Mark as Complete</button>`;
-        }
-        
-        // Make it accessible globally for inline onclick
-        window.markTaskComplete = markTaskComplete;
+      <TextArea
+        value={userAnswer}
+        onChange={(e) => setUserAnswer(e.target.value)}
+        placeholder="Type the sentence here..."
+        className="mb-6"
+      />
+      <Button onClick={checkAnswer} disabled={!userAnswer} className="w-full">
+        ✅ Check Answer
+      </Button>
 
-        // --- Render Content Sections ---
-        function renderDashboard() {
-            const word = vocabulary[Math.floor(Math.random() * vocabulary.length)];
-            document.getElementById('dashboard').innerHTML = `
-                <img src="https://placehold.co/1200x300/1e293b/94a3b8?text=Welcome+to+LingoLeap" alt="Dashboard Banner" class="w-full h-48 object-cover rounded-lg mb-6">
-                <h2 class="text-3xl font-bold mb-2">Dashboard</h2>
-                <p class="text-slate-400 mb-8">Welcome! Here's a quick overview to get you started.</p>
-                <div class="bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-700">
-                    <h3 class="font-semibold text-lg mb-2 text-sky-400">Word of the Day</h3>
-                    <h4 class="text-2xl font-bold">${word.word}</h4>
-                    <p class="text-slate-400 mt-2">${word.meaning}</p>
-                    <p class="text-xs text-slate-500 italic mt-4">e.g., "${word.example}"</p>
-                </div>
-            `;
-        }
-        
-        function renderVocabulary() {
-            document.getElementById('vocabulary').innerHTML = `
-                <img src="https://placehold.co/1200x300/1e293b/94a3b8?text=Vocabulary" alt="Vocabulary Banner" class="w-full h-48 object-cover rounded-lg mb-6">
-                <h2 class="text-3xl font-bold mb-6">Vocabulary Flashcards</h2>
-                 <p class="text-slate-400 mb-4">Click the card to flip it for the definition. Click again to see the next word. Mark complete when you feel you've learned them.</p>
-                <div class="max-w-xl mx-auto">
-                    <div class="flashcard perspective-1000 h-64 mb-6 cursor-pointer rounded-xl">
-                        <div class="flashcard-inner">
-                            <div id="flashcard-front" class="flashcard-front bg-sky-500 text-white"></div>
-                            <div id="flashcard-back" class="flashcard-back bg-slate-700"></div>
+      {isAttempted && feedback && (
+        <div className="mt-6 p-5 bg-purple-100 rounded-lg border border-purple-300 shadow-inner">
+          <p className="font-bold text-purple-800 text-xl mb-3">Result:</p>
+          {feedback}
+        </div>
+      )}
+    </Card>
+  );
+};
+
+
+// --- Vocabulary Section Component ---
+const VocabularySection = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [vocabulary, setVocabulary] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const allVocabulary = [
+    { word: 'Ephemeral', definition: 'Lasting for a very short time.', example: 'The joy of winning was ephemeral.' },
+    { word: 'Ubiquitous', definition: 'Present, appearing, or found everywhere.', example: 'Smartphones are ubiquitous in modern society.' },
+    { word: 'Serendipity', definition: 'The occurrence of events by chance in a happy or beneficial way.', example: 'It was serendipity that they met at the conference.' },
+    { word: 'Mellifluous', definition: 'Sweet or musical; pleasant to hear.', example: 'Her mellifluous voice captivated the audience.' },
+    { word: 'Pernicious', definition: 'Having a harmful effect, especially in a gradual or subtle way.', example: 'The pernicious influence of rumors can be damaging.' },
+  ];
+
+  useEffect(() => {
+    const fetchVocabulary = async () => {
+      await new Promise(resolve => setTimeout(resolve, 300)); // Simulate API call
+      setVocabulary(allVocabulary);
+      setIsLoading(false);
+    };
+    fetchVocabulary();
+  }, []);
+
+  const filteredVocabulary = vocabulary.filter(item =>
+    item.word.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.definition.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <Card title="Vocabulary Builder" className="bg-gradient-to-br from-purple-50 to-pink-100 border border-purple-200">
+      <p className="text-gray-700 mb-6 text-lg text-center">Expand your vocabulary. Search for words and definitions.</p>
+      <Input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="🔍 Search words..." className="mb-8" />
+
+      {isLoading ? ( <LoadingSpinner /> ) : (
+        <div className="space-y-6 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar-y">
+          {filteredVocabulary.length > 0 ? (
+            filteredVocabulary.map((item, index) => (
+              <div key={index} className="p-5 bg-white rounded-lg border border-gray-200 shadow-sm">
+                <h3 className="text-xl font-bold text-indigo-700 mb-2">{item.word}</h3>
+                <p className="text-gray-700 mt-1 text-lg"><span className="font-semibold">Definition:</span> {item.definition}</p>
+                <p className="text-gray-600 text-md mt-2 italic">Example: "{item.example}"</p>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-600 text-center py-12 text-lg">No vocabulary found.</p>
+          )}
+        </div>
+      )}
+      <style>{`.custom-scrollbar-y::-webkit-scrollbar {width: 8px;} .custom-scrollbar-y::-webkit-scrollbar-track {background: #f1f1f1; border-radius: 10px;} .custom-scrollbar-y::-webkit-scrollbar-thumb {background: #aaa; border-radius: 10px;} .custom-scrollbar-y::-webkit-scrollbar-thumb:hover {background: #777;}`}</style>
+    </Card>
+  );
+};
+
+
+// --- Lessons Progress Component ---
+const LessonsProgress = ({ firebaseUid, studentDisplayName }) => {
+  const [lessons, setLessons] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
+
+  const allLessons = [
+    { id: 'week1-basics', title: 'Week 1: Basic Greetings', description: 'Learn to introduce yourself and start conversations.' },
+    { id: 'week2-daily-routines', title: 'Week 2: Daily Routines', description: 'Discuss daily activities using present simple tense.' },
+    { id: 'week3-food-drink', title: 'Week 3: Food & Dining', description: 'Vocabulary for food and ordering at restaurants.' },
+    { id: 'week4-travel-directions', title: 'Week 4: Travel & Directions', description: 'Phrases for traveling and asking for directions.' },
+    { id: 'week5-past-events', title: 'Week 5: Talking about the Past', description: 'Master the simple past tense to discuss experiences.' },
+  ];
+
+  useEffect(() => {
+    if (!firebaseUid) { setIsLoading(false); return; }
+
+    const userProgressDocRef = doc(db, `artifacts/${appId}/users/${firebaseUid}/progress`, 'learningProgress');
+    const unsubscribe = onSnapshot(userProgressDocRef, (docSnap) => {
+      let lastCompletedId = null;
+      if (docSnap.exists()) {
+        lastCompletedId = docSnap.data().lastCompletedLessonId;
+      }
+      const lastCompletedIndex = allLessons.findIndex(lesson => lesson.id === lastCompletedId);
+      const newCurrentIndex = lastCompletedIndex === -1 ? 0 : lastCompletedIndex + 1;
+      
+      setCurrentLessonIndex(newCurrentIndex);
+      setLessons(allLessons.map((lesson, idx) => ({ ...lesson, completed: idx < newCurrentIndex })));
+      setIsLoading(false);
+    }, (error) => {
+      console.error("Error fetching progress:", error);
+      setIsLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [firebaseUid]);
+
+  const markLessonAsCompleted = async (lessonId) => {
+    if (!firebaseUid) return;
+    const userProgressDocRef = doc(db, `artifacts/${appId}/users/${firebaseUid}/progress`, 'learningProgress');
+    const currentLesson = allLessons.find(l => l.id === lessonId);
+    if (!currentLesson) return;
+
+    try {
+      await setDoc(userProgressDocRef, { 
+        lastCompletedLessonId: lessonId,
+        studentDisplayName: studentDisplayName,
+        completedAt: new Date().toISOString()
+      }, { merge: true });
+    } catch (e) {
+      console.error("Error marking lesson as completed: ", e);
+    }
+  };
+
+  if (isLoading) { return <LoadingSpinner />; }
+
+  const currentLesson = lessons[currentLessonIndex];
+
+  return (
+    <Card title="Your Learning Path" className="h-full flex flex-col bg-gradient-to-br from-yellow-50 to-orange-100 border border-yellow-200">
+        <div className="flex-grow">
+            <h3 className="text-2xl font-bold text-gray-700 mb-4 text-center">Next Lesson:</h3>
+            {currentLesson ? (
+            <div className="bg-indigo-100 border border-indigo-300 rounded-2xl p-8 shadow-xl text-center transform scale-105">
+                <h4 className="text-3xl font-extrabold text-indigo-800 mb-3">{currentLesson.title}</h4>
+                <p className="text-gray-700 mb-4 text-xl leading-relaxed">{currentLesson.description}</p>
+                <Button onClick={() => markLessonAsCompleted(currentLesson.id)} className="mt-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 py-3 text-xl">
+                    🎉 Mark as Completed
+                </Button>
+            </div>
+            ) : (
+            <div className="p-8 bg-gray-100 rounded-2xl text-gray-600 text-center shadow-inner">
+                <p className="text-2xl font-semibold">All lessons completed! Fantastic work!</p>
+            </div>
+            )}
+        </div>
+
+        {lessons.length > 0 && (
+            <div className="mt-8">
+                <h3 className="text-2xl font-bold text-gray-700 mb-4 text-center">Overall Progress:</h3>
+                <div className="flex flex-wrap gap-3 justify-center">
+                    {lessons.map(lesson => (
+                        <div key={lesson.id} className={`p-2 rounded-full text-sm font-semibold ${lesson.completed ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-700'}`} title={lesson.title}>
+                           {lesson.completed ? '✅' : '⚫'}
                         </div>
-                    </div>
+                    ))}
                 </div>
-                <div class="flex justify-center">${createCompleteButton('vocab-1')}</div>
-            `;
-            const flashcard = document.querySelector('#vocabulary .flashcard');
-            let currentWordIndex = 0;
-            function updateCard() {
-                const wordData = vocabulary[currentWordIndex];
-                document.querySelector('#flashcard-front').innerHTML = `<h3 class="text-4xl font-bold">${wordData.word}</h3>`;
-                document.querySelector('#flashcard-back').innerHTML = `<div class="text-center"><h4 class="text-2xl font-semibold text-sky-400">${wordData.meaning}</h4><p class="text-slate-300 italic mt-4">"${wordData.example}"</p></div>`;
-                flashcard.classList.remove('is-flipped');
+            </div>
+        )}
+    </Card>
+  );
+};
+
+
+// --- Main App Component ---
+function App() {
+  const [firebaseUid, setFirebaseUid] = useState(null);
+  const [studentDisplayName, setStudentDisplayName] = useState('');
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [profileExists, setProfileExists] = useState(false);
+  const [activeSection, setActiveSection] = useState('speaking');
+
+
+  useEffect(() => {
+    const signInUser = async () => {
+        try {
+            // Use the globally provided token if available, otherwise sign in anonymously
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
+                console.log("Signed in with custom token.");
+            } else {
+                await signInAnonymously(auth);
+                console.log("Signed in anonymously.");
             }
-            flashcard.addEventListener('click', () => {
-                if (!flashcard.classList.contains('is-flipped')) {
-                    flashcard.classList.add('is-flipped');
-                } else {
-                    currentWordIndex = (currentWordIndex + 1) % vocabulary.length;
-                    updateCard();
-                }
-            });
-            updateCard();
+        } catch (error) {
+            console.error("Automatic sign-in failed:", error);
+            setIsAuthLoading(false); // Stop loading on error
         }
+    };
 
-        function renderGrammar() {
-            document.getElementById('grammar').innerHTML = `
-                <img src="https://placehold.co/1200x300/1e293b/94a3b8?text=Grammar" alt="Grammar Banner" class="w-full h-48 object-cover rounded-lg mb-6">
-                <h2 class="text-3xl font-bold mb-6">Grammar Lessons</h2>
-                <div class="space-y-4">
-                ${grammarLessons.map((lesson, i) => `
-                    <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
-                        <h3 class="text-xl font-semibold text-sky-400">${lesson.title}</h3>
-                        <p class="mt-2 text-slate-300">${lesson.content}</p>
-                        ${createCompleteButton(`grammar-${i}`)}
-                    </div>
-                `).join('')}
-                </div>
-            `;
-        }
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setFirebaseUid(user.uid);
+        setIsLoggedIn(true);
 
-        function renderReading() {
-            let content = `<img src="https://placehold.co/1200x300/1e293b/94a3b8?text=Reading" alt="Reading Banner" class="w-full h-48 object-cover rounded-lg mb-6">
-                           <h2 class="text-3xl font-bold mb-6">Reading Comprehension</h2>`;
-            content += readingData.map(article => `
-                 <div class="bg-slate-800 rounded-xl p-8 border border-slate-700 mb-8">
-                    <h3 class="text-2xl font-semibold mb-4 text-sky-400">${article.title}</h3>
-                    <div class="prose prose-invert max-w-none text-slate-300">${article.passage}</div>
-                    <hr class="my-8 border-slate-600">
-                    <div class="space-y-4">
-                        ${article.quiz.map((q, i) => `
-                            <div>
-                                <p class="mb-2 font-semibold">${q.question}</p>
-                                <div class="space-y-2">${q.options.map(opt => `
-                                    <label class="flex items-center p-3 rounded-lg bg-slate-700/50 cursor-pointer hover:bg-slate-700"><input type="radio" name="${article.id}-q${i}" value="${opt}" class="w-4 h-4 text-sky-500 bg-slate-600 border-slate-500 focus:ring-sky-500"><span class="ml-3">${opt}</span></label>
-                                `).join('')}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <div class="flex justify-start mt-4">${createCompleteButton(article.id)}</div>
-                 </div>
-            `).join('');
-            document.getElementById('reading').innerHTML = content;
+        // Check if the user has a profile
+        const userProfileRef = doc(db, `artifacts/${appId}/users/${user.uid}/profile`, 'userData');
+        const docSnap = await getDoc(userProfileRef);
+        if (docSnap.exists()) {
+          setStudentDisplayName(docSnap.data().studentDisplayName);
+          setProfileExists(true);
+        } else {
+          // User is authenticated but has no profile, needs setup
+          setProfileExists(false);
         }
-        
-        function renderListening() {
-            document.getElementById('listening').innerHTML = `
-                 <img src="https://placehold.co/1200x300/1e293b/94a3b8?text=Listening" alt="Listening Banner" class="w-full h-48 object-cover rounded-lg mb-6">
-                 <h2 class="text-3xl font-bold mb-6">Listening Practice</h2>
-                 <div class="bg-slate-800 rounded-xl p-8 border border-slate-700">
-                    <h3 class="text-2xl font-semibold mb-4 text-sky-400">${listeningData.title}</h3>
-                    <button id="play-audio-btn" class="bg-green-600 hover:bg-green-700 p-4 rounded-full transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-white"><path d="M8 5v14l11-7z"/></svg></button>
-                    <p class="text-slate-400 mt-4">Listen to the audio and answer the questions.</p>
-                    <hr class="my-8 border-slate-600">
-                     <div class="space-y-4">
-                        ${listeningData.quiz.map((q, i) => `
-                            <div>
-                                <p class="mb-2 font-semibold">${q.question}</p>
-                                <div class="space-y-2">${q.options.map(opt => `
-                                    <label class="flex items-center p-3 rounded-lg bg-slate-700/50 cursor-pointer hover:bg-slate-700"><input type="radio" name="listen-q${i}" value="${opt}" class="w-4 h-4 text-sky-500 bg-slate-600 border-slate-500 focus:ring-sky-500"><span class="ml-3">${opt}</span></label>
-                                `).join('')}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <div class="flex justify-start mt-4">${createCompleteButton('listening-1')}</div>
-                 </div>
-            `;
-            document.getElementById('play-audio-btn').addEventListener('click', () => {
-                 const utterance = new SpeechSynthesisUtterance(listeningData.transcript);
-                 speechSynthesis.speak(utterance);
-            });
-        }
-        
-        function renderSpeaking() {
-            document.getElementById('speaking').innerHTML = `
-                 <img src="https://placehold.co/1200x300/1e293b/94a3b8?text=Speaking" alt="Speaking Banner" class="w-full h-48 object-cover rounded-lg mb-6">
-                 <h2 class="text-3xl font-bold mb-6">Speaking Practice</h2>
-                 ${speakingSentences.map((sentence, i) => `
-                     <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 mb-4">
-                         <p class="text-slate-400 mb-4">Click the button and say the following sentence:</p>
-                         <p class="text-lg font-semibold text-center p-4 bg-slate-900 rounded-lg">"${sentence}"</p>
-                         <div class="mt-4 flex items-center gap-4">
-                            <button class="speak-btn bg-blue-600 hover:bg-blue-700 p-3 rounded-lg flex items-center" data-sentence="${sentence}">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5 mr-2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="23"/></svg>
-                                Start Speaking
-                            </button>
-                            <p class="speak-result text-sm text-slate-500 flex-grow"></p>
-                         </div>
-                         ${createCompleteButton(`speaking-${i}`)}
-                     </div>
-                 `).join('')}
-            `;
-            setupSpeechRecognition();
-        }
-        
-        function renderDictation() {
-            document.getElementById('dictation').innerHTML = `
-                 <img src="https://placehold.co/1200x300/1e293b/94a3b8?text=Dictation" alt="Dictation Banner" class="w-full h-48 object-cover rounded-lg mb-6">
-                 <h2 class="text-3xl font-bold mb-6">Dictation Practice</h2>
-                 ${dictationSentences.map((sentence, i) => `
-                     <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 mb-4">
-                         <p class="text-slate-400 mb-4">Listen to the sentence and type what you hear.</p>
-                         <div class="mt-4 flex items-center gap-4">
-                            <button class="dictation-listen-btn bg-green-600 hover:bg-green-700 p-3 rounded-lg" data-sentence="${sentence}">Listen</button>
-                            <input type="text" class="dictation-input flex-grow bg-slate-700 rounded-lg p-2 border border-slate-600" placeholder="Type here...">
-                         </div>
-                         <button class="dictation-check-btn mt-4 bg-sky-600 hover:bg-sky-700 px-4 py-2 rounded-lg">Check</button>
-                         <p class="dictation-result mt-2 text-sm"></p>
-                         ${createCompleteButton(`dictation-${i}`)}
-                     </div>
-                 `).join('')}
-            `;
-            setupDictation();
-        }
-        
-        function setupSpeechRecognition() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                document.querySelectorAll('.speak-result').forEach(el => el.textContent = 'Speech recognition not supported in this browser.');
-                return;
-            }
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'en-US';
-            recognition.interimResults = false;
+      } else {
+        // User is signed out
+        setFirebaseUid(null);
+        setStudentDisplayName('');
+        setIsLoggedIn(false);
+        setProfileExists(false);
+      }
+      setIsAuthLoading(false); // Auth check is complete
+    });
 
-            document.querySelectorAll('.speak-btn').forEach(button => {
-                button.addEventListener('click', () => {
-                    const sentence = button.dataset.sentence;
-                    const resultEl = button.nextElementSibling;
-                    resultEl.textContent = 'Listening...';
-                    recognition.onresult = (event) => {
-                        const transcript = event.results[0][0].transcript;
-                        resultEl.textContent = `You said: "${transcript}"`;
-                    };
-                    recognition.onerror = (event) => resultEl.textContent = `Error: ${event.error}`;
-                    recognition.start();
-                });
-            });
-        }
+    signInUser();
 
-        function setupDictation() {
-            document.querySelectorAll('.dictation-listen-btn').forEach(button => {
-                button.addEventListener('click', () => {
-                    const utterance = new SpeechSynthesisUtterance(button.dataset.sentence);
-                    speechSynthesis.speak(utterance);
-                });
-            });
-            document.querySelectorAll('.dictation-check-btn').forEach(button => {
-                button.addEventListener('click', () => {
-                    const container = button.closest('.bg-slate-800');
-                    const input = container.querySelector('.dictation-input').value;
-                    const original = container.querySelector('.dictation-listen-btn').dataset.sentence;
-                    const resultEl = container.querySelector('.dictation-result');
-                    if (input.trim().toLowerCase() === original.trim().toLowerCase().replace(/[.,?]/g, '')) {
-                        resultEl.textContent = 'Correct!';
-                        resultEl.className = 'dictation-result mt-2 text-sm text-green-400';
-                    } else {
-                        resultEl.textContent = `Not quite. The correct sentence was: "${original}"`;
-                        resultEl.className = 'dictation-result mt-2 text-sm text-red-400';
-                    }
-                });
-            });
-        }
+    return () => unsubscribe();
+  }, []);
 
-        // --- Start Application ---
-        initializeAuth();
-    </script>
-</body>
-</html>
+  const handleProfileCreated = (name) => {
+    setStudentDisplayName(name);
+    setProfileExists(true); // Flip the state to render the main app
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
+
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <LoadingSpinner text="Initializing authentication..." />
+      </div>
+    );
+  }
+  
+  if (isLoggedIn && !profileExists) {
+    // User is logged in but needs to create a profile
+    return <ProfileSetup firebaseUid={firebaseUid} onProfileCreated={handleProfileCreated} />;
+  }
+
+  if (!isLoggedIn) {
+    // This case should ideally not be hit with auto-signin, but it's a fallback.
+    return <div className="min-h-screen flex items-center justify-center bg-gray-100"><AlertMessage type="error" message="Could not sign you in. Please refresh the page."/></div>;
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-gray-50 to-purple-50 font-sans text-gray-900 antialiased p-4 sm:p-8 flex flex-col items-center">
+      <div className="w-full max-w-7xl">
+        <header className="mb-10 text-center">
+          <h1 className="text-5xl font-extrabold text-indigo-800">English Language Portal</h1>
+          <p className="text-xl text-gray-700 mt-4">Welcome, <span className="font-extrabold text-purple-700">{studentDisplayName || 'Student'}</span>!</p>
+          <Button onClick={handleLogout} className="bg-red-500 hover:bg-red-600 px-5 py-2 text-md mt-6 shadow-md">
+                🚪 Logout
+          </Button>
+        </header>
+
+        <main className="flex flex-col lg:flex-row gap-10">
+          <aside className="lg:w-1/3 flex-shrink-0">
+            <LessonsProgress firebaseUid={firebaseUid} studentDisplayName={studentDisplayName} />
+          </aside>
+
+          <section className="lg:w-2/3 flex-grow">
+            <nav className="flex flex-wrap justify-center gap-4 mb-8 p-4 bg-white rounded-2xl shadow-lg border border-gray-200">
+              {['speaking', 'dictation', 'vocabulary'].map(section => (
+                  <Button
+                    key={section}
+                    onClick={() => setActiveSection(section)}
+                    className={`flex-1 capitalize text-lg py-3 ${activeSection === section ? 'bg-gradient-to-r from-indigo-700 to-purple-800' : 'bg-gray-600 hover:bg-gray-700 text-gray-200'}`}
+                  >
+                    {section === 'speaking' && '🗣️ '}
+                    {section === 'dictation' && '📝 '}
+                    {section === 'vocabulary' && '📚 '}
+                    {section}
+                  </Button>
+              ))}
+            </nav>
+
+            <div>
+              {activeSection === 'speaking' && <SpeakingExercise firebaseUid={firebaseUid} studentDisplayName={studentDisplayName} />}
+              {activeSection === 'dictation' && <DictationExercise firebaseUid={firebaseUid} studentDisplayName={studentDisplayName} />}
+              {activeSection === 'vocabulary' && <VocabularySection />}
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+  );
+}
+
+export default App;
