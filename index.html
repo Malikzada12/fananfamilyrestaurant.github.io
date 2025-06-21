@@ -1,685 +1,726 @@
 <!DOCTYPE html>
-<html lang="en-PK">
+<html lang="en">
 <head>
-    <!-- ============== SEO Meta Tags ============== -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fanan Family Restaurant |Deals & Best Desi Food</title>
-    <meta name="description" content="Get AI-powered drink suggestions with your meal! Order authentic Pakistani cuisine, deals, and platters online from Fanan Family Restaurant in Multan.">
-    <meta name="keywords" content="AI food suggestion, Pakistani restaurant Multan, student deal multan, desi food deals, food platters multan, Fanan Family Restaurant, best biryani Multan, family restaurant Multan, chicken karahi, online food order">
-    <meta name="author" content="Fanan Family Restaurant">
-
-    <!-- ============== Favicon ============== -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍲</text></svg>">
-    
-    <!-- ============== Stylesheets and Fonts ============== -->
+    <title>LingoLeap - English Learning Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- ============== Custom Styles ============== -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary-color: #c08401; /* A rich, deep gold */
-            --dark-bg: #1a1a1a;
-            --light-bg: #f9f6f2;
-            --text-dark: #2d2d2d;
-            --text-light: #e5e5e5;
+        body { font-family: 'Inter', sans-serif; overflow-y: hidden; }
+        .view-container { display: none; }
+        .form-container { display: none; }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+
+        .loader {
+            border: 4px solid #475569; border-top: 4px solid #38bdf8; border-radius: 50%;
+            width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto;
         }
-        html { scroll-behavior: smooth; }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--light-bg);
-            color: var(--text-dark);
-            overflow-x: hidden; /* Prevent horizontal scroll */
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .flashcard-inner {
+            position: relative; width: 100%; height: 100%;
+            transition: transform 0.6s; transform-style: preserve-3d;
         }
-        .font-display { font-family: 'Cormorant Garamond', serif; }
-        h1, h2, h3 {
-            font-family: 'Cormorant Garamond', serif;
-            font-weight: 700;
+        .flashcard.is-flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-front, .flashcard-back {
+            position: absolute; width: 100%; height: 100%;
+            -webkit-backface-visibility: hidden; backface-visibility: hidden;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 2rem; border-radius: 0.75rem;
         }
-        .hero-section {
-            background-image: linear-gradient(rgba(26, 26, 26, 0.7), rgba(26, 26, 26, 0.7)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2070&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed; /* Parallax effect on desktop */
-        }
-        .nav-link {
-            position: relative;
-            transition: color 0.3s ease;
-        }
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: -5px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: var(--primary-color);
-            transition: width 0.4s ease;
-        }
-        .nav-link:hover::after, .nav-link.active::after { width: 100%; }
-        .btn {
-            padding: 10px 24px;
-            border-radius: 50px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            display: inline-block;
-        }
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-            box-shadow: 0 4px 15px rgba(192, 132, 1, 0.3);
-        }
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 7px 20px rgba(192, 132, 1, 0.5);
-        }
-        .btn-secondary {
-            background-color: #4a5568;
-            color: white;
-        }
-        .btn-secondary:hover {
-            background-color: #2d3748;
-        }
-        .btn-ai {
-            background: linear-gradient(45deg, #8A2BE2, #4A00E0);
-            color: white;
-        }
-        .btn-ai:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 7px 20px rgba(74, 0, 224, 0.4);
-        }
-        .tab-button {
-            transition: all 0.3s ease;
-            border-bottom: 3px solid transparent;
-        }
-        .tab-button.active {
-            color: var(--primary-color);
-            border-bottom-color: var(--primary-color);
-        }
-        .menu-item-card {
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        .menu-item-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
-        .reveal {
-            position: relative;
-            transform: translateY(100px);
-            opacity: 0;
-            transition: 1s all ease;
-        }
-        .reveal.active {
-            transform: translateY(0);
-            opacity: 1;
-        }
-        /* Modal & Cart Styles */
-        .modal, #cart-panel, #mobile-menu {
-            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-        }
-        .modal-overlay, #cart-overlay {
-            transition: opacity 0.3s ease-in-out;
-        }
-        .cart-item-quantity-btn {
-            width: 28px;
-            height: 28px;
-            border: 1px solid #ddd;
-            border-radius: 50%;
-        }
-        /* Floating Cart Button */
-        #floating-cart-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 100;
-        }
-        /* Add to Cart Popup/Toast */
-        #toast-notification {
-            position: fixed;
-            bottom: -100px;
-            left: 50%;
-            transform: translateX(-50%);
-            transition: bottom 0.5s ease-in-out;
-            z-index: 200;
-        }
-        #toast-notification.show {
-            bottom: 30px;
+        .flashcard-back { transform: rotateY(180deg); }
+        
+        .progress-bar-fill {
+            transition: width 0.5s ease-in-out;
         }
     </style>
-
-    <!-- SEO: JSON-LD Schema -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Restaurant",
-      "name": "Fanan Family Restaurant",
-      "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2070&auto=format&fit=crop",
-      "url": "https://www.FananFamilyRestaurant.com",
-      "telephone": "+923008738377",
-      "priceRange": "PKR",
-      "menu": "https://www.FananFamilyRestaurant.com/#menu",
-      "servesCuisine": "Pakistani",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "Old Shujabad Road, Near City Park",
-        "addressLocality": "Multan",
-        "addressRegion": "Punjab",
-        "country": "PK"
-      },
-      "geo": { "@type": "GeoCoordinates", "latitude": 30.1575, "longitude": 71.5249 },
-      "openingHoursSpecification": {
-        "@type": "OpeningHoursSpecification",
-        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
-        "opens": "12:00",
-        "closes": "02:00"
-      } 
-    }
-    </script>
 </head>
-<body class="text-gray-800">
+<body class="bg-slate-900 text-slate-200">
 
-    <!-- Header for Mobile and Top bar for Desktop -->
-    <header class="bg-gray-900 text-white sticky top-0 z-50 shadow-md lg:hidden">
-        <div class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
-             <a href="#" class="text-2xl font-display font-bold">Fanan Restaurant</a>
-             <button id="mobile-menu-button" class="p-2 focus:outline-none">
-                 <svg id="menu-open-icon" xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
-                 <svg id="menu-close-icon" xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-             </button>
-        </div>
-    </header>
-    
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="lg:hidden fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-95 z-40 transform -translate-x-full flex items-center justify-center text-center">
-        <nav class="flex flex-col space-y-8 text-2xl text-white">
-            <a href="#about" class="nav-link mobile-nav-link">About</a>
-            <a href="#menu" class="nav-link mobile-nav-link">Menu</a>
-            <a href="#specials" class="nav-link mobile-nav-link">Specials</a>
-            <a href="#gallery" class="nav-link mobile-nav-link">Gallery</a>
-            <a href="#reviews" class="nav-link mobile-nav-link">Reviews</a>
-            <a href="#contact" class="nav-link mobile-nav-link">Contact</a>
-        </nav>
-    </div>
-
-    <!-- Hero Section with Centered Navigation for Desktop -->
-    <section class="hero-section min-h-screen flex flex-col text-white">
-        <div class="flex-grow flex flex-col justify-center items-center text-center px-4">
-             <div class="mb-8 reveal active">
-                <span class="text-3xl text-yellow-300">Welcome To</span>
-                <h1 class="text-5xl sm:text-6xl md:text-8xl font-display mt-2">Fanan Restaurant</h1>
-                <p class="text-lg md:text-xl mt-4 text-gray-300 max-w-3xl">A Taste of Authentic Pakistani Tradition in Multan</p>
+    <!-- Authentication View -->
+    <div id="auth-view" class="view-container flex items-center justify-center min-h-screen">
+         <div class="w-full max-w-md p-8 space-y-8 bg-slate-800 rounded-2xl shadow-lg border border-slate-700">
+            <div id="loading-view">
+                 <h1 class="text-xl font-bold text-center text-sky-400 mb-4">Connecting to LingoLeap...</h1>
+                 <div class="loader"></div>
             </div>
-            <a href="#menu" class="btn btn-primary reveal active">Explore Menu</a>
-        </div>
-        <nav id="navbar" class="hidden lg:flex bg-black bg-opacity-50 backdrop-blur-sm py-4 justify-center items-center sticky top-0">
-            <div class="container mx-auto flex justify-center items-center space-x-10 text-lg">
-                <a href="#about" class="nav-link">About</a>
-                <a href="#menu" class="nav-link">Menu</a>
-                <a href="#specials" class="nav-link">Specials</a>
-                <a href="#gallery" class="nav-link">Gallery</a>
-                <a href="#reviews" class="nav-link">Reviews</a>
-                <a href="#contact" class="nav-link">Contact</a>
-            </div>
-        </nav>
-    </section>
-
-    <!-- Main Content -->
-    <main>
-        <!-- Menu Section with Tabs -->
-        <section id="menu" class="py-20 md:py-24">
-            <div class="container mx-auto px-6 reveal">
-                <h2 class="text-4xl lg:text-5xl font-display text-center mb-4">Our Menu</h2>
-                <p class="text-center text-lg text-gray-600 max-w-2xl mx-auto mb-12">Sizzling BBQ se le kar mazedar Karahi tak, har cheez lajawab.</p>
-
-                <div id="tab-buttons" class="flex flex-wrap justify-center border-b mb-12 space-x-2 md:space-x-8">
-                    <button class="tab-button active text-base md:text-lg font-semibold py-2 px-4" data-tab="deals">Deals & Platters</button>
-                    <button class="tab-button text-base md:text-lg font-semibold py-2 px-4" data-tab="salan">Main Courses</button>
-                    <button class="tab-button text-base md:text-lg font-semibold py-2 px-4" data-tab="bbq">BBQ & Grill</button>
-                    <button class="tab-button text-base md:text-lg font-semibold py-2 px-4" data-tab="rice">Rice Dishes</button>
-                    <button class="tab-button text-base md:text-lg font-semibold py-2 px-4" data-tab="beverages">Beverages</button>
-                    <button class="tab-button text-base md:text-lg font-semibold py-2 px-4" data-tab="bread">Breads</button>
-                </div>
-
-                <div id="menu-items-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                    <!-- Menu items will be dynamically generated by JS -->
+            <div id="initial-view" class="form-container">
+                <h1 class="text-3xl font-bold text-center text-sky-400 mb-4">Student Login</h1>
+                <p class="text-center text-slate-400 mb-8">Welcome to the English Language Portal.</p>
+                <div class="space-y-4">
+                     <button id="show-signup-btn" class="w-full text-white bg-sky-600 hover:bg-sky-700 font-medium rounded-lg text-sm px-5 py-3 text-center">New Student (Create Account)</button>
+                     <button id="show-login-btn" class="w-full text-white bg-slate-600 hover:bg-slate-700 font-medium rounded-lg text-sm px-5 py-3 text-center">Existing Student (Login)</button>
                 </div>
             </div>
-        </section>
-    </main>
-    
-    <!-- Floating Cart Button -->
-    <button id="floating-cart-button" class="bg-yellow-500 text-white p-4 rounded-full shadow-lg relative transform hover:scale-110 transition-transform">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-        <span id="cart-count" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center hidden">0</span>
-    </button>
-    <!-- Add to Cart Toast Notification -->
-    <div id="toast-notification" class="bg-gray-800 text-white py-2 px-6 rounded-full shadow-lg">
-        <p id="toast-message"></p>
-    </div>
-
-    <!-- Cart Panel -->
-    <div id="cart-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-[110] hidden"></div>
-    <div id="cart-panel" class="fixed top-0 right-0 w-full max-w-md h-full bg-white z-[120] shadow-2xl transform translate-x-full flex flex-col">
-        <div class="flex justify-between items-center p-4 border-b">
-            <h2 class="text-2xl font-display">Cart Menu</h2>
-            <button id="cart-close-button" class="p-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-        </div>
-        <div id="cart-items" class="flex-grow p-4 overflow-y-auto">
-            <p id="empty-cart-msg" class="text-center text-gray-500">Your Cart is Empty.</p>
-        </div>
-        <div id="ai-suggestion-area" class="p-4 border-t hidden">
-             <button id="suggestion-button" class="w-full btn btn-ai mb-4">Perfect Drink Suggestion ✨</button>
-             <div id="suggestion-result" class="text-center"></div>
-        </div>
-        <div class="p-4 border-t bg-gray-50">
-            <div class="flex justify-between items-center mb-4">
-                <span class="text-xl font-bold">Total</span>
-                <span id="cart-total" class="text-xl font-bold text-yellow-700">Rs. 0</span>
+            <div id="signup-container" class="form-container">
+                <h2 class="text-2xl font-bold text-center text-sky-400">Create Your Account</h2>
+                <form id="signup-form" class="mt-8 space-y-6">
+                    <input id="signup-email" type="email" required class="block w-full rounded-md border border-slate-600 bg-slate-700 px-3 py-3 text-slate-200" placeholder="Email address">
+                    <input id="signup-password" type="password" required class="block w-full rounded-md border border-slate-600 bg-slate-700 px-3 py-3 text-slate-200" placeholder="Password">
+                    <button type="submit" class="w-full justify-center rounded-md bg-sky-600 py-3 text-white hover:bg-sky-700">Sign Up</button>
+                </form>
+                <p class="mt-4 text-center text-sm"><a href="#" class="back-to-initial font-medium text-sky-400">← Back</a></p>
             </div>
-            <button id="checkout-button" class="w-full btn btn-primary">Place Order</button>
+            <div id="login-container" class="form-container">
+                <h2 class="text-2xl font-bold text-center text-sky-400">Login to Your Account</h2>
+                <form id="login-form" class="mt-8 space-y-6">
+                    <input id="login-email" type="email" required class="block w-full rounded-md border border-slate-600 bg-slate-700 px-3 py-3 text-slate-200" placeholder="Email address">
+                    <input id="login-password" type="password" required class="block w-full rounded-md border border-slate-600 bg-slate-700 px-3 py-3 text-slate-200" placeholder="Password">
+                    <button type="submit" class="w-full justify-center rounded-md bg-sky-600 py-3 text-white hover:bg-sky-700">Login</button>
+                </form>
+                 <p class="mt-4 text-center text-sm"><a href="#" class="back-to-initial font-medium text-sky-400">← Back</a></p>
+            </div>
+            <div id="message-box" class="hidden text-center p-3 rounded-lg text-sm mt-4"></div>
         </div>
     </div>
     
-    <!-- Checkout Modal -->
-    <div id="checkout-modal-overlay" class="fixed inset-0 bg-black bg-opacity-60 z-[130] hidden modal-overlay"></div>
-    <div id="checkout-modal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11/12 max-w-lg bg-white p-6 rounded-lg shadow-2xl z-[140] hidden modal scale-95 opacity-0">
-        <h2 class="text-3xl font-display mb-6 text-center">Order Details</h2>
-        <form id="checkout-form">
-            <div class="mb-4">
-                <label for="customer-name" class="block text-gray-700 font-semibold mb-2">Your Name</label>
-                <input type="text" id="customer-name" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500" required>
-            </div>
-            <div class="mb-4">
-                <label for="customer-phone" class="block text-gray-700 font-semibold mb-2">Phone Number</label>
-                <input type="tel" id="customer-phone" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500" required>
-            </div>
-            <div class="mb-6">
-                <label for="customer-address" class="block text-gray-700 font-semibold mb-2">Delivery Address</label>
-                <textarea id="customer-address" rows="3" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500" required></textarea>
-            </div>
-            <div class="flex justify-end space-x-4">
-                <button type="button" id="cancel-order-button" class="btn bg-gray-300 text-gray-800">Cancel</button>
-                <button type="submit" class="btn btn-primary">Confirm & Send on WhatsApp</button>
-            </div>
-        </form>
+    <!-- Welcome Popup -->
+    <div id="welcome-popup" class="view-container fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+        <div class="bg-slate-800 p-8 rounded-xl shadow-2xl border border-slate-700 text-center max-w-sm">
+            <h2 class="text-2xl font-bold text-green-400">Login Successful!</h2>
+            <p class="text-lg text-slate-300 mt-4">Welcome to the LMS of English Language</p>
+            <button id="enter-portal-btn" class="mt-8 w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded-lg">Start Learning</button>
+        </div>
     </div>
 
-
-    <!-- Footer etc. -->
-    <footer id="contact" class="bg-gray-900 text-white py-20">
-        <div class="container mx-auto px-6 text-center reveal">
-            <h2 class="text-4xl font-display mb-4">Visit or Call Us</h2>
-            <p class="text-lg text-gray-400 mb-8">We are open from 12:00 PM to 2:00 AM, Seven days a week.</p>
-            <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
-                <div class="bg-gray-800 p-8 rounded-lg">
-                    <h3 class="text-2xl font-display text-yellow-400 mb-2">Location</h3>
-                    <p>Old Shujabad Road, Near City Park <br> Multan, Punjab, Pakistan</p>
-                </div>
-                 <div class="bg-gray-800 p-8 rounded-lg">
-                    <h3 class="text-2xl font-display text-yellow-400 mb-2">Reservations & Delivery</h3>
-                    <div class="flex flex-col space-y-2 mt-2">
-                        <a href="tel:+923008738377" class="text-white hover:text-yellow-400 text-xl font-bold transition-colors">+92 300 8738377</a>
-                        <a href="tel:+923017881076" class="text-white hover:text-yellow-400 text-xl font-bold transition-colors">+92 301 7881076</a>
-                    </div>
-                </div>
-            </div>
-             <p class="text-sm mt-12 text-gray-500">&copy; <span id="year"></span> Fanan Family Restaurant. Designed by Ali Asghar Virk.</p>
-        </div>
-    </footer>
-
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // --- Globals ---
-        let cart = [];
-        const menuItemsContainer = document.getElementById('menu-items-container');
-        const tabButtons = document.querySelectorAll('.tab-button');
-        const restaurantWhatsAppNumber = "923006234699"; // IMPORTANT: Replace with your actual WhatsApp number with country code
-        
-        // --- Menu Data ---
-        const menuData = {
-            deals: [
-                { id: 'D01', name: 'Shahi Deal', desc: 'Half Chicken, 2 Tikka Boti, 2 Chk Kabab, Half Saji w/Rice, 4 Roti, Salad, Raita.', price: 2599, img: 'https://placehold.co/600x400/c08401/FFF?text=Shahi+Deal', type: 'food' },
-                { id: 'D02', name: '4 Person Platter', desc: '4 Pizza Kabab, 4 Labanese Kabab, 4 Qalmi Tikka, 4 Malai Boti, Full Afghani Pulao.', price: 3390, img: 'https://placehold.co/600x400/c08401/FFF?text=4+Person+Platter', type: 'food' },
-                { id: 'D03', name: 'Student Deal', desc: '2 Chicken Kabab, 4 Tikka Boti, 1/4 Chk Karahi, Rice, Raita, 4 Roti, 1 Ltr Drink.', price: 1699, img: 'https://placehold.co/600x400/c08401/FFF?text=Student+Deal', type: 'food' }
-            ],
-            salan: [
-                { id: 'S01', name: 'Chicken Karahi', desc: 'Classic wok-cooked dish with rich tomato and ginger gravy.', price: 1200, img: 'https://images.unsplash.com/photo-1631515243349-e0cb75fb8da7?q=80&w=600&auto=format&fit=crop', type: 'food' },
-                { id: 'S02', name: 'Mutton Korma', desc: 'Tender mutton in a creamy, spiced yogurt sauce.', price: 1800, img: 'https://images.unsplash.com/photo-1629548489387-2795b861aa84?q=80&w=600&auto=format&fit=crop', type: 'food' },
-            ],
-            bbq: [
-                { id: 'B01', name: 'Chicken Tikka Boti', desc: 'Spicy, marinated chicken chunks grilled to perfection.', price: 800, img: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?q=80&w=600&auto=format&fit=crop', type: 'food' },
-                { id: 'B02', name: 'Seekh Kebab', desc: 'Minced meat skewers infused with herbs and spices.', price: 950, img: 'https://images.unsplash.com/photo-1529692236671-f1f6b5f46b54?q=80&w=600&auto=format&fit=crop', type: 'food' },
-            ],
-            rice: [
-                { id: 'R01', name: 'Chicken Biryani', desc: 'Aromatic basmati rice with spiced chicken, a national favorite.', price: 600, img: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?q=80&w=600&auto=format&fit=crop', type: 'food' },
-                { id: 'R02', name: 'Mutton Pulao', desc: 'Subtly flavored rice cooked in rich mutton broth.', price: 850, img: 'https://images.unsplash.com/photo-1630409349884-a59026d1814a?q=80&w=600&auto=format&fit=crop', type: 'food' },
-            ],
-             beverages: [
-                { id: 'V01', name: 'Sweet Lassi', desc: 'Refreshing and creamy sweet yogurt-based drink.', price: 200, img: 'https://placehold.co/600x400/E6E6FA/333?text=Lassi', type: 'drink' },
-                { id: 'V02', name: 'Mint Margarita', desc: 'A zesty and cool slushy perfect for Multan\'s heat.', price: 250, img: 'https://placehold.co/600x400/98FB98/333?text=Margarita', type: 'drink' },
-                { id: 'V03', name: 'Soft Drink', desc: 'Chilled carbonated soft drinks.', price: 100, img: 'https://placehold.co/600x400/FF6347/FFF?text=Soft+Drink', type: 'drink' },
-            ],
-            bread: [
-                { id: 'N01', name: 'Roghni Naan', desc: 'Soft, fluffy naan bread brushed with butter and sesame seeds.', price: 70, img: 'https://placehold.co/600x400/D2691E/FFF?text=Roghni+Naan', type: 'food' },
-                { id: 'N02', name: 'Garlic Naan', desc: 'Popular flatbread topped with fresh garlic and coriander.', price: 80, img: 'https://placehold.co/600x400/DEB887/333?text=Garlic+Naan', type: 'food' },
-            ]
-        };
-
-        // --- UI Elements ---
-        const cartPanel = document.getElementById('cart-panel');
-        const cartOverlay = document.getElementById('cart-overlay');
-        const cartItemsContainer = document.getElementById('cart-items');
-        const emptyCartMsg = document.getElementById('empty-cart-msg');
-        const cartTotalEl = document.getElementById('cart-total');
-        const toastEl = document.getElementById('toast-notification');
-        const toastMessageEl = document.getElementById('toast-message');
-        const aiSuggestionArea = document.getElementById('ai-suggestion-area');
-        const suggestionButton = document.getElementById('suggestion-button');
-        const suggestionResultEl = document.getElementById('suggestion-result');
-        const checkoutModal = document.getElementById('checkout-modal');
-        const checkoutModalOverlay = document.getElementById('checkout-modal-overlay');
-        const checkoutForm = document.getElementById('checkout-form');
-        
-        // --- Toast Notification Logic ---
-        function showToast(message) {
-            toastMessageEl.textContent = message;
-            toastEl.classList.add('show');
-            setTimeout(() => {
-                toastEl.classList.remove('show');
-            }, 3000); // Hide after 3 seconds
-        }
-
-        // --- Cart Logic ---
-        function addToCart(itemId, showMsg = true) {
-            const existingItem = cart.find(item => item.id === itemId);
-            let itemName = '';
-            
-            if (existingItem) {
-                existingItem.quantity++;
-                itemName = existingItem.name;
-            } else {
-                let itemToAdd;
-                for (const category in menuData) {
-                    const found = menuData[category].find(item => item.id === itemId);
-                    if (found) {
-                        itemToAdd = { ...found, quantity: 1 };
-                        break;
-                    }
-                }
-                if (itemToAdd) {
-                    cart.push(itemToAdd);
-                    itemName = itemToAdd.name;
-                }
-            }
-            if(showMsg) showToast(`'${itemName}' Added to your Cart Menu!`);
-            updateCart();
-        }
-
-        function updateQuantity(itemId, change) {
-            const itemInCart = cart.find(item => item.id === itemId);
-            if (itemInCart) {
-                itemInCart.quantity += change;
-                if (itemInCart.quantity <= 0) {
-                    cart = cart.filter(item => item.id !== itemId);
-                }
-            }
-            updateCart();
-        }
-
-        function updateCart() {
-            renderCartItems();
-            updateCartTotal();
-            updateCartCount();
-            toggleAiSuggestion();
-        }
-
-        function renderCartItems() {
-            cartItemsContainer.innerHTML = '';
-            if (cart.length === 0) {
-                cartItemsContainer.appendChild(emptyCartMsg);
-                emptyCartMsg.style.display = 'block';
-                return;
-            }
-            emptyCartMsg.style.display = 'none';
-            cart.forEach(item => {
-                const itemEl = document.createElement('div');
-                itemEl.className = 'flex items-center justify-between mb-4';
-                itemEl.innerHTML = `
-                    <div class="flex items-center">
-                        <img src="${item.img}" alt="${item.name}" class="w-16 h-16 object-cover rounded-md mr-4">
-                        <div>
-                            <p class="font-bold">${item.name}</p>
-                            <p class="text-sm text-gray-600">Rs. ${item.price}</p>
+    <!-- Main Learning Portal View -->
+    <div id="portal-view" class="view-container">
+        <div class="flex flex-col h-screen">
+            <!-- Header -->
+            <header class="bg-slate-800/80 backdrop-blur-md border-b border-slate-700 px-6 py-3 flex items-center justify-between z-10">
+                <h1 class="text-2xl font-bold text-sky-400">LingoLeap</h1>
+                <div class="flex items-center gap-6">
+                    <div class="w-72">
+                        <div class="flex justify-between items-center mb-1">
+                            <p class="text-sm text-slate-400">Your Progress</p>
+                            <p id="progress-text" class="text-xs text-slate-500">0%</p>
+                        </div>
+                        <div class="w-full bg-slate-700 rounded-full h-2">
+                            <div id="progress-bar" class="bg-green-500 h-2 rounded-full progress-bar-fill" style="width: 0%"></div>
                         </div>
                     </div>
-                    <div class="flex items-center">
-                        <button class="cart-item-quantity-btn" onclick="updateQuantity('${item.id}', -1)">-</button>
-                        <span class="px-3 font-bold">${item.quantity}</span>
-                        <button class="cart-item-quantity-btn" onclick="updateQuantity('${item.id}', 1)">+</button>
+                    <div class="flex items-center gap-3">
+                        <div class="text-right">
+                            <p id="user-email-display" class="text-sm font-semibold truncate"></p>
+                            <p class="text-xs text-slate-500">Student</p>
+                        </div>
+                        <button id="logout-btn" class="bg-red-600/50 hover:bg-red-600 text-white p-2 rounded-full" title="Logout">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                        </button>
                     </div>
-                `;
-                cartItemsContainer.appendChild(itemEl);
-            });
-        }
-        
-        window.updateQuantity = updateQuantity;
+                </div>
+            </header>
+            <div class="flex flex-1 overflow-hidden">
+                <!-- Sidebar Navigation -->
+                <aside class="w-60 bg-slate-800/50 p-6 flex flex-col">
+                    <nav class="flex-grow">
+                        <ul class="space-y-2">
+                            <li><a href="#" class="nav-link flex items-center p-3 rounded-lg bg-sky-500/20 text-slate-200" data-target="dashboard">Dashboard</a></li>
+                            <li><a href="#" class="nav-link flex items-center p-3 rounded-lg text-slate-400 hover:bg-slate-700/50" data-target="vocabulary">Vocabulary</a></li>
+                            <li><a href="#" class="nav-link flex items-center p-3 rounded-lg text-slate-400 hover:bg-slate-700/50" data-target="grammar">Grammar</a></li>
+                            <li><a href="#" class="nav-link flex items-center p-3 rounded-lg text-slate-400 hover:bg-slate-700/50" data-target="reading">Reading</a></li>
+                            <li><a href="#" class="nav-link flex items-center p-3 rounded-lg text-slate-400 hover:bg-slate-700/50" data-target="listening">Listening</a></li>
+                            <li><a href="#" class="nav-link flex items-center p-3 rounded-lg text-slate-400 hover:bg-slate-700/50" data-target="speaking">Speaking</a></li>
+                            <li><a href="#" class="nav-link flex items-center p-3 rounded-lg text-slate-400 hover:bg-slate-700/50" data-target="dictation">Dictation</a></li>
+                        </ul>
+                    </nav>
+                </aside>
 
-        function updateCartTotal() {
-            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            cartTotalEl.textContent = `Rs. ${total}`;
-            return total;
-        }
+                <!-- Main Content -->
+                <main class="flex-1 p-8 overflow-y-auto">
+                    <section id="dashboard" class="content-section active"></section>
+                    <section id="vocabulary" class="content-section"></section>
+                    <section id="grammar" class="content-section"></section>
+                    <section id="reading" class="content-section"></section>
+                    <section id="listening" class="content-section"></section>
+                    <section id="speaking" class="content-section"></section>
+                    <section id="dictation" class="content-section"></section>
+                </main>
+            </div>
+        </div>
+    </div>
 
-        function updateCartCount() {
-            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-            const countEl = document.getElementById('cart-count');
-            if (totalItems > 0) {
-                countEl.textContent = totalItems;
-                countEl.classList.remove('hidden');
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        
+        // --- MASSIVELY EXPANDED DATA SETS ---
+        const vocabulary = [ 
+            // Tier 1: Common Words
+            { word: 'Also', meaning: 'In addition; too.', example: 'She is a talented musician and also a great painter.' },
+            { word: 'Always', meaning: 'At all times; on all occasions.', example: 'He always arrives early for meetings.' },
+            { word: 'Ask', meaning: 'Say something in order to obtain an answer or some information.', example: 'If you don\'t know, you should ask.' },
+            { word: 'Because', meaning: 'For the reason that; since.', example: 'I am late because there was heavy traffic.' },
+            { word: 'Before', meaning: 'During the period of time preceding a particular event or time.', example: 'Please finish your homework before you go out to play.' },
+            { word: 'Big', meaning: 'Of considerable size, extent, or intensity.', example: 'That is a very big dog.' },
+            { word: 'Come', meaning: 'Move or travel toward or into a place thought of as near or familiar to the speaker.', example: 'Can you come to my party on Saturday?' },
+            { word: 'Day', meaning: 'Each of the twenty-four-hour periods, reckoned from one midnight to the next.', example: 'It was a beautiful sunny day.' },
+            { word: 'Find', meaning: 'Discover or perceive by chance or unexpectedly.', example: 'I can\'t find my keys anywhere.' },
+            { word: 'First', meaning: 'Coming before all others in time or order; earliest; 1st.', example: 'She was the first person to arrive.' },
+            { word: 'For', meaning: 'Indicating the purpose or reason for something.', example: 'This gift is for you.' },
+            { word: 'Friend', meaning: 'A person whom one knows and with whom one has a bond of mutual affection.', example: 'He is my best friend.' },
+            { word: 'From', meaning: 'Indicating the starting point of a journey or action.', example: 'The train from London has arrived.' },
+            { word: 'Go', meaning: 'Move from one place to another; travel.', example: 'We need to go to the store.' },
+            { word: 'Good', meaning: 'To be desired or approved of.', example: 'She did a good job on the project.' },
+            { word: 'Happy', meaning: 'Feeling or showing pleasure or contentment.', example: 'The happy child was laughing.' },
+            { word: 'Have', meaning: 'Possess, own, or hold.', example: 'I have two brothers.' },
+            { word: 'Here', meaning: 'In, at, or to this place or position.', example: 'Please put the box right here.' },
+            { word: 'How', meaning: 'In what way or manner; by what means.', example: 'How do you solve this problem?' },
+            { word: 'Into', meaning: 'Expressing movement or action with the result that someone or something becomes enclosed or surrounded by something else.', example: 'He jumped into the pool.' },
+            { word: 'Like', meaning: 'Having the same characteristics or qualities as; similar to.', example: 'She looks like her mother.' },
+            { word: 'Little', meaning: 'Small in size, amount, or degree.', example: 'There is a little cat in the garden.' },
+            { word: 'Long', meaning: 'Measuring a great distance from end to end.', example: 'It was a long journey.' },
+            { word: 'Look', meaning: 'Direct one\'s gaze toward someone or something or in a specified direction.', example: 'Look at that beautiful sunset!' },
+            { word: 'Make', meaning: 'Form (something) by putting parts together or combining substances; construct; create.', example: 'Can you make a cup of tea?' },
+            { word: 'Many', meaning: 'A large number of.', example: 'There are many books on the shelf.' },
+            { word: 'More', meaning: 'A greater or additional amount or degree of.', example: 'I need more time to finish.' },
+            { word: 'My', meaning: 'Belonging to or associated with the speaker.', example: 'This is my house.' },
+            { word: 'New', meaning: 'Produced, introduced, or discovered recently or now for the first time.', example: 'I bought a new car.' },
+            { word: 'Not', meaning: 'Used with an auxiliary verb or "be" to form the negative.', example: 'I am not tired.' },
+            { word: 'Now', meaning: 'At the present time or moment.', example: 'We have to leave now.' },
+            { word: 'Of', meaning: 'Expressing the relationship between a part and a whole.', example: 'A piece of cake.' },
+            { word: 'On', meaning: 'Physically in contact with and supported by (a surface).', example: 'The book is on the table.' },
+            { word: 'One', meaning: 'The lowest cardinal number; half of two; 1.', example: 'There is only one cookie left.' },
+            { word: 'Only', meaning: 'And no one or nothing more besides; solely or exclusively.', example: 'He was the only person there.' },
+            { word: 'Or', meaning: 'Used to link alternatives.', example: 'Do you want tea or coffee?' },
+            { word: 'Other', meaning: 'Used to refer to a person or thing that is different or distinct from one already mentioned.', example: 'The other students are in the library.' },
+            { word: 'Our', meaning: 'Belonging to or associated with the speaker and one or more other people.', example: 'This is our home.' },
+            { word: 'Out', meaning: 'Moving or appearing to move away from a particular place, especially one that is enclosed or hidden.', example: 'She walked out of the room.' },
+            { word: 'Over', meaning: 'Extending directly upward from.', example: 'The bridge is over the river.' },
+            { word: 'People', meaning: 'Human beings in general or considered collectively.', example: 'There were many people at the concert.' },
+            { word: 'Place', meaning: 'A particular position or point in space.', example: 'This is a good place for a picnic.' },
+            { word: 'Say', meaning: 'Utter words so as to convey information, an opinion, a feeling or intention, or a question.', example: 'What did you say?' },
+            { word: 'See', meaning: 'Perceive with the eyes; discern visually.', example: 'Did you see that bird?' },
+            { word: 'She', meaning: 'Used to refer to a woman, girl, or female animal previously mentioned.', example: 'She is my sister.' },
+            { word: 'So', meaning: 'And for this reason; therefore.', example: 'It was raining, so I took an umbrella.' },
+            { word: 'Some', meaning: 'An unspecified amount or number of.', example: 'I would like some water, please.' },
+            { word: 'Take', meaning: 'Lay hold of (something) with one\'s hands; reach for and hold.', example: 'Please take one.' },
+            { word: 'Tell', meaning: 'Communicate information, facts, or news to someone in spoken or written words.', example: 'Can you tell me the time?' },
+            { word: 'Than', meaning: 'Introducing the second element in a comparison.', example: 'He is taller than his brother.' },
+            { word: 'That', meaning: 'Used to identify a specific person or thing observed by the speaker.', example: 'That is my car.' },
+            { word: 'The', meaning: 'Denoting one or more people or things already mentioned or assumed to be common knowledge.', example: 'The sun is shining.' },
+            { word: 'Their', meaning: 'Belonging to or associated with the people or things previously mentioned.', example: 'The children are with their parents.' },
+            { word: 'Them', meaning: 'Used as the object of a verb or preposition to refer to two or more people or things previously mentioned.', example: 'I saw them at the park.' },
+            { word: 'Then', meaning: 'At that time; at the time in question.', example: 'First I will go to the bank, then to the store.' },
+            { word: 'There', meaning: 'In, at, or to that place or position.', example: 'The book is over there.' },
+            { word: 'These', meaning: 'Plural of this.', example: 'These apples are delicious.' },
+            { word: 'They', meaning: 'Used to refer to two or more people or things previously mentioned.', example: 'They are playing in the garden.' },
+            { word: 'Thing', meaning: 'An object that one need not, cannot, or does not wish to give a specific name to.', example: 'What is that thing on the table?' },
+            { word: 'Think', meaning: 'Have a particular opinion, belief, or idea about someone or something.', example: 'I think it will rain today.' },
+            { word: 'This', meaning: 'Used to identify a specific person or thing close at hand or being indicated or experienced.', example: 'This is my favorite song.' },
+            { word: 'Those', meaning: 'Plural of that.', example: 'Those mountains are beautiful.' },
+            { word: 'Time', meaning: 'The indefinite continued progress of existence and events in the past, present, and future regarded as a whole.', example: 'What time is it?' },
+            { word: 'To', meaning: 'Expressing motion in the direction of (a particular location).', example: 'I am going to the library.' },
+            { word: 'Up', meaning: 'Toward a higher place or position.', example: 'The balloon went up into the sky.' },
+            { word: 'Use', meaning: 'Take, hold, or deploy (something) as a means of accomplishing a purpose or achieving a result; employ.', example: 'Can I use your pen?' },
+            { word: 'Very', meaning: 'In a high degree.', example: 'It is very cold outside.' },
+            { word: 'Want', meaning: 'Have a desire to possess or do (something); wish for.', example: 'I want a new bike.' },
+            { word: 'Way', meaning: 'A method, style, or manner of doing something.', example: 'This is the best way to do it.' },
+            { word: 'We', meaning: 'Used by a speaker to refer to himself or herself and one or more other people.', example: 'We are going on vacation.' },
+            { word: 'Well', meaning: 'In a good or satisfactory way.', example: 'She speaks English very well.' },
+            { word: 'What', meaning: 'Asking for information specifying something.', example: 'What is your name?' },
+            { word: 'When', meaning: 'At what time.', example: 'When does the movie start?' },
+            { word: 'Which', meaning: 'Asking for information specifying one or more people or things from a definite set.', example: 'Which color do you prefer?' },
+            { word: 'Who', meaning: 'What or which person or people.', example: 'Who is that person?' },
+            { word: 'Will', meaning: 'Expressing the future tense.', example: 'I will call you later.' },
+            { word: 'With', meaning: 'Accompanied by (another person or thing).', example: 'I am going with my friends.' },
+            { word: 'Work', meaning: 'Activity involving mental or physical effort done in order to achieve a purpose or result.', example: 'I have a lot of work to do.' },
+            { word: 'Would', meaning: 'Used to express a desire or a polite request.', example: 'Would you like some tea?' },
+            { word: 'Year', meaning: 'The time taken by the earth to make one revolution around the sun.', example: 'The year is 2025.' },
+            { word: 'You', meaning: 'Used to refer to the person or people that the speaker is addressing.', example: 'You are a good student.' },
+            { word: 'Your', meaning: 'Belonging to or associated with the person or people that the speaker is addressing.', example: 'Is this your book?' },
+
+            // Tier 2: Intermediate Words
+            { word: 'Aberration', meaning: 'A departure from what is normal, usual, or expected, typically an unwelcome one.', example: 'The single poor grade was an aberration in her otherwise excellent academic record.' },
+            { word: 'Acquiesce', meaning: 'Accept something reluctantly but without protest.', example: 'She was unwilling to acquiesce to their demands.' },
+            { word: 'Alacrity', meaning: 'Bris_k and cheerful readiness.', example: 'She accepted the invitation with alacrity.' },
+            { word: 'Amiable', meaning: 'Having or displaying a friendly and pleasant manner.', example: 'He was an amiable man, always ready with a smile.' },
+            { word: 'Appease', meaning: 'Pacify or placate (someone) by acceding to their demands.', example: 'The government tried to appease the protesters with new policies.' },
+            { word: 'Arcane', meaning: 'Understood by few; mysterious or secret.', example: 'He was the only one who understood the arcane rules of the ancient game.' },
+            { word: 'Avarice', meaning: 'Extreme greed for wealth or material gain.', example: 'His avarice led him to make some unethical business decisions.' },
+            { word: 'Banal', meaning: 'So lacking in originality as to be obvious and boring.', example: 'The plot of the movie was completely banal.' },
+            { word: 'Benevolent', meaning: 'Well meaning and kindly.', example: 'A benevolent donor provided the funds for the new hospital wing.' },
+            { word: 'Capricious', meaning: 'Given to sudden and unaccountable changes of mood or behavior.', example: 'The capricious weather made it difficult to plan the outdoor event.' },
+            { word: 'Catalyst', meaning: 'A person or thing that precipitates an event.', example: 'The assassination of the archduke was the catalyst for World War I.' },
+            { word: 'Caustic', meaning: 'Sarcastic in a scathing and bitter way.', example: 'His caustic remarks were not appreciated by the team.' },
+            { word: 'Clandestine', meaning: 'Kept secret or done secretively, especially because illicit.', example: 'They held a clandestine meeting in the dead of night.' },
+            { word: 'Cognizant', meaning: 'Having knowledge or being aware of.', example: 'He was cognizant of the risks involved.' },
+            { word: 'Complacent', meaning: 'Showing smug or uncritical satisfaction with oneself or one\'s achievements.', example: 'We can\'t afford to become complacent about our success.' },
+            { word: 'Conundrum', meaning: 'A confusing and difficult problem or question.', example: 'The source of the mysterious noise was a conundrum for the residents.' },
+            { word:- 'Credulous', meaning: 'Having or showing too great a readiness to believe things.', example: 'Credulous people are easily fooled by scams.' },
+            { word: 'Deleterious', meaning: 'Causing harm or damage.', example: 'The chemical is deleterious to the environment.' },
+            { word: 'Demeanor', meaning: 'Outward behavior or bearing.', example: 'She had a calm and professional demeanor.' },
+            { word: 'Didactic', meaning: 'Intended to teach, particularly in having moral instruction as an ulterior motive.', example: 'The professor\'s didactic style was informative but a bit dry.' },
+            { word: 'Disparate', meaning: 'Essentially different in kind; not allowing comparison.', example: 'The study brought together disparate areas of research.' },
+            { word: 'Dogmatic', meaning: 'Inclined to lay down principles as incontrovertibly true.', example: 'He was a dogmatic and inflexible leader.' },
+            { word: 'Dubious', meaning: 'Hesitating or doubting; not to be relied upon.', example: 'I was dubious about his chances of success.' },
+            { word: 'Eclectic', meaning: 'Deriving ideas, style, or taste from a broad and diverse range of sources.', example: 'Her musical tastes are very eclectic.' },
+            { word: 'Egregious', meaning: 'Outstandingly bad; shocking.', example: 'It was an egregious error for a statesman to show such poor judgment.' },
+            { word: 'Elicit', meaning: 'Evoke or draw out (a response, answer, or fact) from someone.', example: 'The lawyer tried to elicit a confession from the witness.' },
+            { word: 'Epitome', meaning: 'A person or thing that is a perfect example of a particular quality or type.', example: 'She is the epitome of grace and elegance.' },
+            { word: 'Equanimity', meaning: 'Mental calmness, composure, and evenness of temper, especially in a difficult situation.', example: 'She accepted both the good and the bad with equanimity.' },
+            { word: 'Erroneous', meaning: 'Wrong; incorrect.', example: 'The scientists concluded that their initial findings were erroneous.' },
+            { word: 'Eschew', meaning: 'Deliberately avoid using; abstain from.', example: 'He appealed to the crowd to eschew violence.' },
+            { word: 'Exacerbate', meaning: 'Make (a problem, bad situation, or negative feeling) worse.', example: 'His angry comments only served to exacerbate the situation.' },
+            { word: 'Fastidious', meaning: 'Very attentive to and concerned about accuracy and detail.', example: 'He was fastidious about his appearance.' },
+            { word: 'Fatuous', meaning: 'Silly and pointless.', example: 'It was a fatuous comment that contributed nothing to the discussion.' },
+            { word: 'Fortuitous', meaning: 'Happening by accident or chance rather than design.', example: 'A fortuitous meeting with a film director launched her career.' },
+            { word: 'Garrulous', meaning: 'Excessively talkative, especially on trivial matters.', example: 'The garrulous old man told us his life story.' },
+            { word: 'Gregarious', meaning: '(Of a person) fond of company; sociable.', example: 'He was a popular and gregarious man.' },
+            { word: 'Hapless', meaning: '(Especially of a person) unfortunate.', example: 'The hapless tourists had their luggage stolen.' },
+            { word: 'Harangue', meaning: 'A lengthy and aggressive speech.', example: 'He delivered a long harangue about the evils of modern society.' },
+            { word: 'Iconoclast', meaning: 'A person who attacks cherished beliefs or institutions.', example: 'As an artist, she was an iconoclast, constantly pushing boundaries.' },
+            { word: 'Idiosyncrasy', meaning: 'A mode of behavior or way of thought peculiar to an individual.', example: 'One of his idiosyncrasies was always wearing a red tie.' },
+            { word: 'Impeccable', meaning: '(Of behavior, performance, or appearance) in accordance with the highest standards of propriety; faultless.', example: 'He had impeccable manners.' },
+            { word: 'Impetuous', meaning: 'Acting or done quickly and without thought or care.', example: 'His impetuous decision to quit his job was a mistake.' },
+            { word: 'Incongruous', meaning: 'Not in harmony or keeping with the surroundings or other aspects of something.', example: 'The modern sculpture looked incongruous in the ancient castle.' },
+            { word: 'Indolent', meaning: 'Wanting to avoid activity or exertion; lazy.', example: 'He spent the indolent afternoon napping in a hammock.' },
+            { word: 'Ineffable', meaning: 'Too great or extreme to be expressed or described in words.', example: 'The view from the mountaintop was one of ineffable beauty.' },
+            { word: 'Inexorable', meaning: 'Impossible to stop or prevent.', example: 'The inexorable advance of technology continues to change our world.' },
+            { word: 'Innate', meaning: 'Inborn; natural.', example: 'He had an innate talent for music.' },
+            { word: 'Insidious', meaning: 'Proceeding in a gradual, subtle way, but with harmful effects.', example: 'The insidious effects of the disease were not noticed at first.' },
+            { word: 'Juxtaposition', meaning: 'The fact of two things being seen or placed close together with contrasting effect.', example: 'The juxtaposition of the old and new buildings was striking.' },
+            { word: 'Laconic', meaning: '(Of a person, speech, or style of writing) using very few words.', example: 'His laconic reply suggested a lack of interest.' },
+            { word: 'Laudable', meaning: '(Of an action, idea, or goal) deserving praise and commendation.', example: 'Her efforts to help the homeless are laudable.' },
+            { word: 'Loquacious', meaning: 'Tending to talk a great deal; talkative.', example: 'The loquacious host kept the party entertained.' },
+
+            // Tier 3: Advanced Words
+            { word: 'Ephemeral', meaning: 'Lasting for a very short time.', example: 'The beauty of the cherry blossoms is ephemeral.' }, 
+            { word: 'Ubiquitous', meaning: 'Present, appearing, or found everywhere.', example: 'Smartphones have become ubiquitous in modern society.' }, 
+            { word: 'Mellifluous', meaning: 'A sound that is sweet and pleasant to hear.', example: 'She had a mellifluous voice that soothed everyone.' }, 
+            { word: 'Parsimonious', meaning: 'Unwilling to spend money or use resources; frugal to a fault.', example: 'His parsimonious nature meant he would walk miles to save a few cents on bus fare.' },
+            { word: 'Magnanimous', meaning: 'Very generous or forgiving, especially toward a rival or someone less powerful.', example: 'The magnanimous victor allowed the defeated army to retreat peacefully.' },
+            { word: 'Ostentatious', meaning: 'Characterized by pretentious display; designed to impress.', example: 'He bought an ostentatious sports car to show off his new wealth.' },
+            { word: 'Precocious', meaning: 'Having developed certain abilities at an earlier age than usual.', example: 'The precocious child was reading novels at the age of five.' },
+            { word: 'Quandary', meaning: 'A state of perplexity or uncertainty over what to do in a difficult situation.', example: 'She was in a quandary about whether to accept the job offer or continue her studies.' },
+            { word: 'Recalcitrant', meaning: 'Having an obstinately uncooperative attitude toward authority or discipline.', example: 'The recalcitrant student refused to do any of his assignments.' },
+            { word: 'Salient', meaning: 'Most noticeable or important.', example: 'The salient point of his argument was that the plan was too expensive.' },
+            { word: 'Sycophant', meaning: 'A person who acts obsequiously toward someone important in order to gain advantage.', example: 'The king was surrounded by sycophants who were only interested in their own gain.' },
+            { word: 'Taciturn', meaning: '(Of a person) reserved or uncommunicative in speech; saying little.', example: 'The taciturn farmer rarely spoke more than a few words at a time.' },
+            { word: 'Unctuous', meaning: '(Of a person) excessively or ingratiatingly flattering; oily.', example: 'The unctuous salesman was trying too hard to be my friend.' },
+            { word: 'Vapid', meaning: 'Offering nothing that is stimulating or challenging; bland.', example: 'The conversation was vapid and uninteresting.' },
+            { word: 'Veracity', meaning: 'Conformity to facts; accuracy.', example: 'The veracity of his story was questionable.' },
+            { word: 'Vicissitude', meaning: 'A change of circumstances or fortune, typically one that is unwelcome or unpleasant.', example: 'He had experienced all the vicissitudes of a long and difficult life.' },
+            { word: 'Vilify', meaning: 'Speak or write about in an abusively disparaging manner.', example: 'The politician was vilified in the press for his controversial views.' },
+            { word: 'Vociferous', meaning: '(Especially of a person or speech) vehement or clamorous.', example: 'The vociferous protests could be heard from blocks away.' },
+            { word: 'Zephyr', meaning: 'A soft gentle breeze.', example: 'A gentle zephyr rustled the leaves in the trees.' },
+        ];
+        const grammarLessons = [ 
+            { title: "Present Simple vs. Continuous", content: `Use <strong>Present Simple</strong> for habits, routines, and general truths (e.g., "The sun rises in the east."). Use <strong>Present Continuous</strong> for actions happening at the moment of speaking or temporary situations (e.g., "I am reading a book right now.").` }, 
+            { title: "Past Simple vs. Past Continuous", content: `Use <strong>Past Simple</strong> for completed actions in the past (e.g., "I visited Paris last year."). Use <strong>Past Continuous</strong> for actions that were in progress at a specific time in the past (e.g., "I was watching TV when you called.").` },
+            { title: "Present Perfect vs. Past Simple", content: `Use <strong>Present Perfect</strong> for actions that happened at an unspecified time in the past or have a connection to the present (e.g., "I have lost my keys."). Use <strong>Past Simple</strong> for actions that happened at a specific, finished time (e.g., "I lost my keys yesterday.").` },
+            { title: "Future Tenses: will, be going to, Present Continuous", content: `Use <strong>will</strong> for predictions, spontaneous decisions, and promises (e.g., "I think it will rain."). Use <strong>be going to</strong> for plans and intentions (e.g., "I am going to start a new course."). Use <strong>Present Continuous</strong> for fixed arrangements in the near future (e.g., "I am meeting my friend tomorrow.").` },
+            { title: "Articles: A, An, The, and No Article", content: `Use <strong>'a'/'an'</strong> for non-specific, singular countable nouns. Use <strong>'the'</strong> for specific nouns known to the listener. Use <strong>no article</strong> for general plural or uncountable nouns (e.g., "I like music." or "Dogs are loyal.").` }, 
+            { title: "Prepositions of Time: In, On, At", content: `Use <strong>in</strong> for months, years, seasons, and parts of the day (in July, in 2025, in the morning). Use <strong>on</strong> for days and dates (on Monday, on May 5th). Use <strong>at</strong> for specific times and holidays (at 7 PM, at Christmas).` },
+            { title: "Modal Verbs of Obligation and Permission", content: `<strong>Must/Have to</strong> express strong obligation (e.g., "You must wear a helmet."). <strong>Should</strong> expresses advice (e.g., "You should eat more vegetables."). <strong>Can/May</strong> express permission (e.g., "Can I open the window?").` },
+            { title: "Conditionals: Zero, First, Second, Third", content: `<strong>Zero:</strong> general truths (If you heat water, it boils). <strong>First:</strong> possible future (If it rains, we'll stay home). <strong>Second:</strong> hypothetical/unlikely present/future (If I won the lottery, I would travel). <strong>Third:</strong> hypothetical past (If I had studied, I would have passed the exam).` },
+            { title: "Reported Speech (Indirect Speech)", content: `When reporting what someone said, you often have to change the tense (backshift), pronouns, and time expressions. "I am happy today," he said. -> He said that he was happy that day.` },
+            { title: "The Passive Voice", content: `The passive voice is used when the focus is on the action, not the person who did it. The object of the active sentence becomes the subject of the passive sentence. Active: "Someone stole my bike." -> Passive: "My bike was stolen."` },
+            { title: "Gerunds and Infinitives", content: `A <strong>gerund</strong> (-ing form) acts as a noun (e.g., "<strong>Swimming</strong> is fun."). An <strong>infinitive</strong> (to + verb) can also be a noun, or follow adjectives/verbs (e.g., "I want <strong>to swim</strong>." or "It's important <strong>to be</strong> on time.").` },
+            { title: "Relative Clauses: Defining and Non-defining", content: `<strong>Defining clauses</strong> give essential information ("The man <strong>who lives next door</strong> is a doctor."). <strong>Non-defining clauses</strong> give extra information and use commas ("My brother, <strong>who lives in London</strong>, is a doctor.").` }
+        ];
+        const readingData = [
+            {
+                id: 'reading-1',
+                title: "The History of Coffee",
+                passage: `<p>Coffee is one of the most popular beverages worldwide, yet its origins are shrouded in legend. The most famous story traces its discovery to an Ethiopian goat herder named Kaldi in the 9th century. He noticed his goats became incredibly energetic after eating berries from a particular tree. Kaldi tried the berries himself and experienced a similar stimulating effect. He reported his findings to the abbot of a local monastery, who made a drink with the berries and found it kept him alert through long hours of evening prayer. The knowledge of the energizing berries began to spread.</p><p>From Ethiopia, coffee cultivation and trade began on the Arabian Peninsula. By the 15th century, it was being grown in the Yemeni district of Arabia and by the 16th century, it was known in Persia, Egypt, Syria, and Turkey. Coffee was not only enjoyed in homes but also in the many public coffee houses — called <em>qahveh khaneh</em> — which began to appear in cities across the Near East. These coffee houses became important centers for social activity and the exchange of information.</p>`,
+                quiz: [
+                    { question: "According to legend, who first discovered coffee?", options: ["A Turkish merchant", "An Ethiopian goat herder", "An Arabian monk"], answer: "An Ethiopian goat herder" },
+                    { question: "What effect did the coffee berries have on the goats?", options: ["They became sleepy", "They became sick", "They became energetic"], answer: "They became energetic" },
+                    { question: "What were the public coffee houses in the Near East called?", options: ["Café", "Qahveh khaneh", "Coffee shops"], answer: "Qahveh khaneh" }
+                ]
+            },
+            {
+                id: 'reading-2',
+                title: "The Importance of Sleep",
+                passage: `<p>In our fast-paced, 24/7 society, sleep is often viewed as a luxury rather than a necessity. However, a vast body of scientific research confirms that sleep is crucial for physical and mental health. During sleep, the body works to support healthy brain function and maintain physical health. In children and teens, sleep also helps support growth and development.</p><p>The long-term consequences of sleep deprivation are serious. Chronic sleep loss can increase the risk of several health problems, including heart disease, kidney disease, high blood pressure, diabetes, and stroke. It can also impair cognitive functions, such as attention, decision-making, and creativity. Furthermore, a lack of sleep can affect emotional regulation, leading to mood swings and an increased risk of anxiety and depression. Prioritizing consistent, quality sleep is one of the most important things you can do for your overall well-being.</p>`,
+                quiz: [
+                    { question: "What is a major function of sleep?", options: ["Increasing stress levels", "Supporting healthy brain function", "Wasting time"], answer: "Supporting healthy brain function" },
+                    { question: "Which of these is NOT a potential consequence of sleep deprivation?", options: ["Improved memory", "Heart disease", "High blood pressure"], answer: "Improved memory" }
+                ]
+            }
+        ];
+        const listeningData = { title: "Ordering a Pizza", transcript: "Hi, I'd like to order a large pepperoni pizza with extra cheese. Can I also get a side of garlic bread and a two-liter bottle of soda? Thank you.", quiz: [ { question: "What size pizza is ordered?", options: ["Small", "Medium", "Large"], answer: "Large" }, { question: "What is the main topping on the pizza?", options: ["Mushrooms", "Pepperoni", "Onions"], answer: "Pepperoni" }, { question: "What drink is ordered?", options: ["Water", "Juice", "Soda"], answer: "Soda" }] };
+        const speakingSentences = [ "The quick brown fox jumps over the lazy dog.", "She sells seashells by the seashore.", "How can a clam cram in a clean cream can?", "I have a meeting at three o'clock this afternoon.", "Peter Piper picked a peck of pickled peppers.", "Red lorry, yellow lorry." ];
+        const dictationSentences = [ "The weather is beautiful today.", "My favorite color is blue.", "He is coming to the party tonight.", "Let's go for a walk in the park.", "The library is closed on Sundays.", "Don't forget to buy milk." ];
+        
+        // --- Firebase Setup ---
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        
+        // --- Global State ---
+        let completedTasks = new Set();
+        let totalTasks = 0;
+
+        // --- UI Element References ---
+        const authView = document.getElementById('auth-view');
+        const portalView = document.getElementById('portal-view');
+        const welcomePopup = document.getElementById('welcome-popup');
+        const loadingView = document.getElementById('loading-view');
+        const initialView = document.getElementById('initial-view');
+        const signupContainer = document.getElementById('signup-container');
+        const loginContainer = document.getElementById('login-container');
+        const messageBox = document.getElementById('message-box');
+        
+        // --- Auth Listeners ---
+        onAuthStateChanged(auth, user => {
+            hideMessage();
+            if (user && !user.isAnonymous) {
+                // User is logged in with a permanent account
+                authView.style.display = 'none';
+                portalView.style.display = 'none';
+                welcomePopup.style.display = 'flex';
+                document.getElementById('user-email-display').textContent = user.email;
+            } else if (user && user.isAnonymous) {
+                // User is anonymous, show login/signup options.
+                authView.style.display = 'flex';
+                portalView.style.display = 'none';
+                welcomePopup.style.display = 'none';
+                showAuthForm(initialView);
             } else {
-                countEl.classList.add('hidden');
+                // User is signed out.
+                initializeAuth();
             }
-        }
-        
-        function toggleCart() {
-            cartPanel.classList.toggle('translate-x-full');
-            cartOverlay.classList.toggle('hidden');
-        }
-        
-        // --- Checkout Modal Logic ---
-        function toggleCheckoutModal() {
-            if (checkoutModal.classList.contains('hidden')) {
-                checkoutModal.classList.remove('hidden');
-                checkoutModalOverlay.classList.remove('hidden');
-                setTimeout(() => {
-                    checkoutModal.classList.remove('scale-95', 'opacity-0');
-                }, 10);
-            } else {
-                checkoutModal.classList.add('scale-95', 'opacity-0');
-                setTimeout(() => {
-                    checkoutModal.classList.add('hidden');
-                    checkoutModalOverlay.classList.add('hidden');
-                }, 300);
-            }
-        }
-        
-        document.getElementById('checkout-button').addEventListener('click', () => {
-             if(cart.length === 0) {
-                alert('Add Some item in Cart .');
-                return;
-            }
-            toggleCart(); // Close the cart panel
-            toggleCheckoutModal(); // Open the checkout modal
         });
         
-        document.getElementById('cancel-order-button').addEventListener('click', toggleCheckoutModal);
-        checkoutModalOverlay.addEventListener('click', toggleCheckoutModal);
-        
-        checkoutForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const customerName = document.getElementById('customer-name').value;
-            const customerPhone = document.getElementById('customer-phone').value;
-            const customerAddress = document.getElementById('customer-address').value;
+        // --- Main App Initialization ---
+        function initializeAppContent() {
+            // Reset state for new login
+            completedTasks = new Set();
+            totalTasks = 0;
             
-            let orderSummary = `*New Order from Fanan Restaurant Website* 🍲\n\n`;
-            orderSummary += `*Customer Details:*\n`;
-            orderSummary += `Name: ${customerName}\n`;
-            orderSummary += `Phone: ${customerPhone}\n`;
-            orderSummary += `Address: ${customerAddress}\n\n`;
-            orderSummary += `*Order Items:*\n`;
-            
-            cart.forEach(item => {
-                orderSummary += `- ${item.name} (x${item.quantity}) = Rs. ${item.price * item.quantity}\n`;
-            });
-            
-            orderSummary += `\n*Total Amount: Rs. ${updateCartTotal()}*`;
-            
-            const whatsappUrl = `https://wa.me/${restaurantWhatsAppNumber}?text=${encodeURIComponent(orderSummary)}`;
-            
-            window.open(whatsappUrl, '_blank');
-            
-            // Clear everything
-            cart = [];
-            updateCart();
-            checkoutForm.reset();
-            toggleCheckoutModal();
-        });
-
-
-        // --- AI Suggestion Logic ---
-        function toggleAiSuggestion() {
-            const hasFoodItems = cart.some(item => item.type === 'food');
-            if(hasFoodItems) {
-                aiSuggestionArea.classList.remove('hidden');
-            } else {
-                aiSuggestionArea.classList.add('hidden');
-                suggestionResultEl.innerHTML = ''; 
-            }
+            setupNavigation();
+            renderDashboard();
+            renderVocabulary();
+            renderGrammar();
+            renderReading();
+            renderListening();
+            renderSpeaking();
+            renderDictation();
+            updateProgressBar();
         }
 
-        async function getDrinkSuggestion() {
-            suggestionButton.disabled = true;
-            suggestionResultEl.innerHTML = `<p class="text-gray-500">Suggesting the best drink for you...</p>`;
-            const foodItems = cart.filter(item => item.type === 'food').map(item => item.name).join(', ');
-            const drinkOptions = menuData.beverages.map(drink => drink.name).join(', ');
-            const prompt = `You are a helpful restaurant assistant for 'Fanan Family Restaurant', which serves spicy and rich Pakistani food. A customer has the following items in their cart: ${foodItems}. Based on these items, suggest the single best beverage to pair with their meal from the following available options: ${drinkOptions}. Provide your response as a valid JSON object with two keys: "drinkName" (the exact name of the suggested drink from the list) and "reason" (a short, fun, one-sentence reason in Hindi (Latin) explaining why it's a good pairing). Example: {"drinkName": "Sweet Lassi", "reason": "Is masaledar khane ke baad thandi lassi ka maza hi kuch aur hai!"}`;
-            
+        // --- Auth UI and Logic ---
+        function showAuthForm(formToShow) {
+            loadingView.style.display = 'none';
+            initialView.style.display = 'none';
+            signupContainer.style.display = 'none';
+            loginContainer.style.display = 'none';
+            formToShow.style.display = 'block';
+        }
+        
+        function showMessage(message, isError = false) {
+            messageBox.textContent = message;
+            messageBox.className = `text-center p-3 rounded-lg text-sm mt-4 ${isError ? 'bg-red-900/50 text-red-300' : 'bg-green-900/50 text-green-300'}`;
+        }
+        function hideMessage() { messageBox.className = 'hidden'; }
+
+        document.getElementById('show-signup-btn').addEventListener('click', () => showAuthForm(signupContainer));
+        document.getElementById('show-login-btn').addEventListener('click', () => showAuthForm(loginContainer));
+        document.querySelectorAll('.back-to-initial').forEach(btn => btn.addEventListener('click', (e) => { e.preventDefault(); showAuthForm(initialView); }));
+
+        document.getElementById('signup-form').addEventListener('submit', (e) => {
+            e.preventDefault(); hideMessage();
+            const email = e.target['signup-email'].value;
+            const password = e.target['signup-password'].value;
+            createUserWithEmailAndPassword(auth, email, password)
+                .catch(err => showMessage(err.message, true));
+        });
+
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault(); hideMessage();
+            const email = e.target['login-email'].value;
+            const password = e.target['login-password'].value;
+            signInWithEmailAndPassword(auth, email, password)
+                .catch(err => showMessage(err.message, true));
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
+        
+        document.getElementById('enter-portal-btn').addEventListener('click', () => {
+             welcomePopup.style.display = 'none';
+             authView.style.display = 'none';
+             portalView.style.display = 'block';
+             initializeAppContent();
+        });
+
+        // --- Initial Mandatory Auth Flow ---
+        async function initializeAuth() {
+            authView.style.display = 'flex';
+            showAuthForm(loadingView);
             try {
-                 let chatHistory = [];
-                 chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-                 const payload = { contents: chatHistory };
-                 const apiKey = "" 
-                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-                 const response = await fetch(apiUrl, {
-                     method: 'POST',
-                     headers: { 'Content-Type': 'application/json' },
-                     body: JSON.stringify(payload)
-                 });
-                 const result = await response.json();
-                
-                 if (result.candidates && result.candidates.length > 0) {
-                    const textResponse = result.candidates[0].content.parts[0].text.replace(/```json\n?/, '').replace(/```$/, '');
-                    const jsonResponse = JSON.parse(textResponse);
-                    const suggestedDrink = menuData.beverages.find(d => d.name === jsonResponse.drinkName);
-                    if(suggestedDrink) {
-                        renderSuggestion(suggestedDrink, jsonResponse.reason);
-                    } else { throw new Error("Suggested drink not found in menu."); }
-                 } else { throw new Error("No suggestion received from AI."); }
-
-            } catch(error) {
-                console.error("Gemini API Error:", error);
-                suggestionResultEl.innerHTML = `<p class="text-red-500">Sorry, process is not responding at this moment.</p>`;
-            } finally {
-                suggestionButton.disabled = false;
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    if (!auth.currentUser) await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Initial auth failed:", error);
+                showMessage("Connection Error. Please refresh.", true);
+                showAuthForm(loadingView);
+                loadingView.querySelector('h1').textContent = "Connection Error";
             }
         }
         
-        function renderSuggestion(drink, reason) {
-             suggestionResultEl.innerHTML = `
-                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                    <p class="font-semibold text-gray-700">Our Opinion:</p>
-                    <div class="flex items-center my-2">
-                        <img src="${drink.img}" alt="${drink.name}" class="w-12 h-12 rounded-full object-cover mr-3">
-                        <div>
-                            <p class="font-bold text-lg text-yellow-800">${drink.name}</p>
-                            <p class="text-sm text-gray-600 italic">"${reason}"</p>
-                        </div>
-                    </div>
-                    <button class="w-full btn btn-secondary text-sm mt-2" onclick="addSuggestedToCart('${drink.id}')">Isko bhi add karein</button>
-                </div>
-            `;
-        }
-        window.addSuggestedToCart = (itemId) => { addToCart(itemId); suggestionResultEl.innerHTML = `<p class="text-green-600 font-semibold">Behtareen! Cart mein add ho gaya.</p>`; };
-        suggestionButton.addEventListener('click', getDrinkSuggestion);
-        document.getElementById('floating-cart-button').addEventListener('click', toggleCart);
-        document.getElementById('cart-close-button').addEventListener('click', toggleCart);
-        cartOverlay.addEventListener('click', toggleCart);
-
-        // --- Menu Rendering Logic ---
-        function renderMenuItems(category) {
-            menuItemsContainer.innerHTML = '';
-            const items = menuData[category];
-            items.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'menu-item-card h-full flex flex-col';
-                card.innerHTML = `
-                    <img src="${item.img}" alt="${item.name}" class="w-full h-48 object-cover">
-                    <div class="p-4 md:p-6 flex-grow flex flex-col">
-                        <h3 class="text-xl md:text-2xl mb-2">${item.name}</h3>
-                        <p class="text-gray-600 mb-4 flex-grow text-sm">${item.desc}</p>
-                        <div class="flex justify-between items-center mt-4">
-                            <span class="font-bold text-lg md:text-xl text-yellow-700">Rs. ${item.price}</span>
-                            <button class="btn btn-secondary text-sm" data-item-id="${item.id}">Add to Cart</button>
-                        </div>
-                    </div>
-                `;
-                menuItemsContainer.appendChild(card);
-            });
-            menuItemsContainer.querySelectorAll('[data-item-id]').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    addToCart(e.target.dataset.itemId);
+        // --- Navigation ---
+        function setupNavigation() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.dataset.target;
+                    navLinks.forEach(l => l.classList.remove('bg-sky-500/20', 'text-slate-200'));
+                    link.classList.add('bg-sky-500/20', 'text-slate-200');
+                    contentSections.forEach(s => s.classList.toggle('active', s.id === targetId));
                 });
             });
         }
 
-        tabButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                tabButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                renderMenuItems(button.dataset.tab);
+        // --- Progress Tracking ---
+        function markTaskComplete(taskId) {
+            completedTasks.add(taskId);
+            const button = document.querySelector(`[data-task-id="${taskId}"]`);
+            if (button) {
+                button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Completed`;
+                button.disabled = true;
+                button.classList.remove('bg-sky-600', 'hover:bg-sky-700');
+                button.classList.add('bg-green-600', 'cursor-not-allowed');
+            }
+            updateProgressBar();
+        }
+
+        function updateProgressBar() {
+            const percentage = totalTasks > 0 ? (completedTasks.size / totalTasks) * 100 : 0;
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+            document.getElementById('progress-text').textContent = `${Math.round(percentage)}% Complete (${completedTasks.size}/${totalTasks})`;
+        }
+        
+        function createCompleteButton(taskId) {
+            totalTasks++;
+            return `<button data-task-id="${taskId}" onclick="window.markTaskComplete('${taskId}')" class="mt-4 bg-sky-600 hover:bg-sky-700 font-semibold py-2 px-4 rounded-lg transition-colors flex items-center text-sm">Mark as Complete</button>`;
+        }
+        
+        // Make it accessible globally for inline onclick
+        window.markTaskComplete = markTaskComplete;
+
+        // --- Render Content Sections ---
+        function renderDashboard() {
+            const word = vocabulary[Math.floor(Math.random() * vocabulary.length)];
+            document.getElementById('dashboard').innerHTML = `
+                <img src="https://placehold.co/1200x300/1e293b/94a3b8?text=Welcome+to+LingoLeap" alt="Dashboard Banner" class="w-full h-48 object-cover rounded-lg mb-6">
+                <h2 class="text-3xl font-bold mb-2">Dashboard</h2>
+                <p class="text-slate-400 mb-8">Welcome! Here's a quick overview to get you started.</p>
+                <div class="bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-700">
+                    <h3 class="font-semibold text-lg mb-2 text-sky-400">Word of the Day</h3>
+                    <h4 class="text-2xl font-bold">${word.word}</h4>
+                    <p class="text-slate-400 mt-2">${word.meaning}</p>
+                    <p class="text-xs text-slate-500 italic mt-4">e.g., "${word.example}"</p>
+                </div>
+            `;
+        }
+        
+        function renderVocabulary() {
+            document.getElementById('vocabulary').innerHTML = `
+                <img src="https://placehold.co/1200x300/1e293b/94a3b8?text=Vocabulary" alt="Vocabulary Banner" class="w-full h-48 object-cover rounded-lg mb-6">
+                <h2 class="text-3xl font-bold mb-6">Vocabulary Flashcards</h2>
+                 <p class="text-slate-400 mb-4">Click the card to flip it for the definition. Click again to see the next word. Mark complete when you feel you've learned them.</p>
+                <div class="max-w-xl mx-auto">
+                    <div class="flashcard perspective-1000 h-64 mb-6 cursor-pointer rounded-xl">
+                        <div class="flashcard-inner">
+                            <div id="flashcard-front" class="flashcard-front bg-sky-500 text-white"></div>
+                            <div id="flashcard-back" class="flashcard-back bg-slate-700"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-center">${createCompleteButton('vocab-1')}</div>
+            `;
+            const flashcard = document.querySelector('#vocabulary .flashcard');
+            let currentWordIndex = 0;
+            function updateCard() {
+                const wordData = vocabulary[currentWordIndex];
+                document.querySelector('#flashcard-front').innerHTML = `<h3 class="text-4xl font-bold">${wordData.word}</h3>`;
+                document.querySelector('#flashcard-back').innerHTML = `<div class="text-center"><h4 class="text-2xl font-semibold text-sky-400">${wordData.meaning}</h4><p class="text-slate-300 italic mt-4">"${wordData.example}"</p></div>`;
+                flashcard.classList.remove('is-flipped');
+            }
+            flashcard.addEventListener('click', () => {
+                if (!flashcard.classList.contains('is-flipped')) {
+                    flashcard.classList.add('is-flipped');
+                } else {
+                    currentWordIndex = (currentWordIndex + 1) % vocabulary.length;
+                    updateCard();
+                }
             });
-        });
-        renderMenuItems('deals'); // Initial render
+            updateCard();
+        }
+
+        function renderGrammar() {
+            document.getElementById('grammar').innerHTML = `
+                <img src="https://placehold.co/1200x300/1e293b/94a3b8?text=Grammar" alt="Grammar Banner" class="w-full h-48 object-cover rounded-lg mb-6">
+                <h2 class="text-3xl font-bold mb-6">Grammar Lessons</h2>
+                <div class="space-y-4">
+                ${grammarLessons.map((lesson, i) => `
+                    <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+                        <h3 class="text-xl font-semibold text-sky-400">${lesson.title}</h3>
+                        <p class="mt-2 text-slate-300">${lesson.content}</p>
+                        ${createCompleteButton(`grammar-${i}`)}
+                    </div>
+                `).join('')}
+                </div>
+            `;
+        }
+
+        function renderReading() {
+            let content = `<img src="https://placehold.co/1200x300/1e293b/94a3b8?text=Reading" alt="Reading Banner" class="w-full h-48 object-cover rounded-lg mb-6">
+                           <h2 class="text-3xl font-bold mb-6">Reading Comprehension</h2>`;
+            content += readingData.map(article => `
+                 <div class="bg-slate-800 rounded-xl p-8 border border-slate-700 mb-8">
+                    <h3 class="text-2xl font-semibold mb-4 text-sky-400">${article.title}</h3>
+                    <div class="prose prose-invert max-w-none text-slate-300">${article.passage}</div>
+                    <hr class="my-8 border-slate-600">
+                    <div class="space-y-4">
+                        ${article.quiz.map((q, i) => `
+                            <div>
+                                <p class="mb-2 font-semibold">${q.question}</p>
+                                <div class="space-y-2">${q.options.map(opt => `
+                                    <label class="flex items-center p-3 rounded-lg bg-slate-700/50 cursor-pointer hover:bg-slate-700"><input type="radio" name="${article.id}-q${i}" value="${opt}" class="w-4 h-4 text-sky-500 bg-slate-600 border-slate-500 focus:ring-sky-500"><span class="ml-3">${opt}</span></label>
+                                `).join('')}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="flex justify-start mt-4">${createCompleteButton(article.id)}</div>
+                 </div>
+            `).join('');
+            document.getElementById('reading').innerHTML = content;
+        }
         
-        // --- Mobile Menu Toggle ---
-        const menuButton = document.getElementById('mobile-menu-button');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const openIcon = document.getElementById('menu-open-icon');
-        const closeIcon = document.getElementById('menu-close-icon');
-        const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
-        function toggleMobileMenu() { mobileMenu.classList.toggle('-translate-x-full'); openIcon.classList.toggle('hidden'); closeIcon.classList.toggle('hidden'); }
-        menuButton.addEventListener('click', toggleMobileMenu);
-        mobileNavLinks.forEach(link => link.addEventListener('click', toggleMobileMenu));
+        function renderListening() {
+            document.getElementById('listening').innerHTML = `
+                 <img src="https://placehold.co/1200x300/1e293b/94a3b8?text=Listening" alt="Listening Banner" class="w-full h-48 object-cover rounded-lg mb-6">
+                 <h2 class="text-3xl font-bold mb-6">Listening Practice</h2>
+                 <div class="bg-slate-800 rounded-xl p-8 border border-slate-700">
+                    <h3 class="text-2xl font-semibold mb-4 text-sky-400">${listeningData.title}</h3>
+                    <button id="play-audio-btn" class="bg-green-600 hover:bg-green-700 p-4 rounded-full transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-white"><path d="M8 5v14l11-7z"/></svg></button>
+                    <p class="text-slate-400 mt-4">Listen to the audio and answer the questions.</p>
+                    <hr class="my-8 border-slate-600">
+                     <div class="space-y-4">
+                        ${listeningData.quiz.map((q, i) => `
+                            <div>
+                                <p class="mb-2 font-semibold">${q.question}</p>
+                                <div class="space-y-2">${q.options.map(opt => `
+                                    <label class="flex items-center p-3 rounded-lg bg-slate-700/50 cursor-pointer hover:bg-slate-700"><input type="radio" name="listen-q${i}" value="${opt}" class="w-4 h-4 text-sky-500 bg-slate-600 border-slate-500 focus:ring-sky-500"><span class="ml-3">${opt}</span></label>
+                                `).join('')}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="flex justify-start mt-4">${createCompleteButton('listening-1')}</div>
+                 </div>
+            `;
+            document.getElementById('play-audio-btn').addEventListener('click', () => {
+                 const utterance = new SpeechSynthesisUtterance(listeningData.transcript);
+                 speechSynthesis.speak(utterance);
+            });
+        }
         
-        // --- Animation and Other JS ---
-        const revealElements = document.querySelectorAll(".reveal");
-        function reveal() { for (let i = 0; i < revealElements.length; i++) { if (revealElements[i].getBoundingClientRect().top < window.innerHeight - 100) { revealElements[i].classList.add("active"); } } }
-        window.addEventListener("scroll", reveal);
-        reveal();
-        document.getElementById('year').textContent = new Date().getFullYear();
-    });
+        function renderSpeaking() {
+            document.getElementById('speaking').innerHTML = `
+                 <img src="https://placehold.co/1200x300/1e293b/94a3b8?text=Speaking" alt="Speaking Banner" class="w-full h-48 object-cover rounded-lg mb-6">
+                 <h2 class="text-3xl font-bold mb-6">Speaking Practice</h2>
+                 ${speakingSentences.map((sentence, i) => `
+                     <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 mb-4">
+                         <p class="text-slate-400 mb-4">Click the button and say the following sentence:</p>
+                         <p class="text-lg font-semibold text-center p-4 bg-slate-900 rounded-lg">"${sentence}"</p>
+                         <div class="mt-4 flex items-center gap-4">
+                            <button class="speak-btn bg-blue-600 hover:bg-blue-700 p-3 rounded-lg flex items-center" data-sentence="${sentence}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5 mr-2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="23"/></svg>
+                                Start Speaking
+                            </button>
+                            <p class="speak-result text-sm text-slate-500 flex-grow"></p>
+                         </div>
+                         ${createCompleteButton(`speaking-${i}`)}
+                     </div>
+                 `).join('')}
+            `;
+            setupSpeechRecognition();
+        }
+        
+        function renderDictation() {
+            document.getElementById('dictation').innerHTML = `
+                 <img src="https://placehold.co/1200x300/1e293b/94a3b8?text=Dictation" alt="Dictation Banner" class="w-full h-48 object-cover rounded-lg mb-6">
+                 <h2 class="text-3xl font-bold mb-6">Dictation Practice</h2>
+                 ${dictationSentences.map((sentence, i) => `
+                     <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 mb-4">
+                         <p class="text-slate-400 mb-4">Listen to the sentence and type what you hear.</p>
+                         <div class="mt-4 flex items-center gap-4">
+                            <button class="dictation-listen-btn bg-green-600 hover:bg-green-700 p-3 rounded-lg" data-sentence="${sentence}">Listen</button>
+                            <input type="text" class="dictation-input flex-grow bg-slate-700 rounded-lg p-2 border border-slate-600" placeholder="Type here...">
+                         </div>
+                         <button class="dictation-check-btn mt-4 bg-sky-600 hover:bg-sky-700 px-4 py-2 rounded-lg">Check</button>
+                         <p class="dictation-result mt-2 text-sm"></p>
+                         ${createCompleteButton(`dictation-${i}`)}
+                     </div>
+                 `).join('')}
+            `;
+            setupDictation();
+        }
+        
+        function setupSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                document.querySelectorAll('.speak-result').forEach(el => el.textContent = 'Speech recognition not supported in this browser.');
+                return;
+            }
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+
+            document.querySelectorAll('.speak-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const sentence = button.dataset.sentence;
+                    const resultEl = button.nextElementSibling;
+                    resultEl.textContent = 'Listening...';
+                    recognition.onresult = (event) => {
+                        const transcript = event.results[0][0].transcript;
+                        resultEl.textContent = `You said: "${transcript}"`;
+                    };
+                    recognition.onerror = (event) => resultEl.textContent = `Error: ${event.error}`;
+                    recognition.start();
+                });
+            });
+        }
+
+        function setupDictation() {
+            document.querySelectorAll('.dictation-listen-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const utterance = new SpeechSynthesisUtterance(button.dataset.sentence);
+                    speechSynthesis.speak(utterance);
+                });
+            });
+            document.querySelectorAll('.dictation-check-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const container = button.closest('.bg-slate-800');
+                    const input = container.querySelector('.dictation-input').value;
+                    const original = container.querySelector('.dictation-listen-btn').dataset.sentence;
+                    const resultEl = container.querySelector('.dictation-result');
+                    if (input.trim().toLowerCase() === original.trim().toLowerCase().replace(/[.,?]/g, '')) {
+                        resultEl.textContent = 'Correct!';
+                        resultEl.className = 'dictation-result mt-2 text-sm text-green-400';
+                    } else {
+                        resultEl.textContent = `Not quite. The correct sentence was: "${original}"`;
+                        resultEl.className = 'dictation-result mt-2 text-sm text-red-400';
+                    }
+                });
+            });
+        }
+
+        // --- Start Application ---
+        initializeAuth();
     </script>
 </body>
 </html>
